@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Muhammad Ibrahim Awan | Applied AI Engineer</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap');
+
+        :root {
+            --bg-dark: #050507;
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --accent-glow: rgba(0, 240, 255, 0.15);
+            --accent-border: rgba(0, 240, 255, 0.3);
+            --text-main: #a0a0a0;
+            --title-white: #ffffff;
+            --logo-bg: #f8f9fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Space Grotesk', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 255, 255, 0.03), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(128, 0, 255, 0.03), transparent 25%);
+        }
+
+        h1, h2, h3, h4, h5, h6, .white-title {
+            color: var(--title-white);
+            font-weight: 700;
+        }
+
+        /* Navigation */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 5%;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 100;
+            background: rgba(5, 5, 7, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .logo-container {
+            background-color: var(--logo-bg);
+            color: #050507;
+            padding: 0.5rem 1.2rem;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+        }
+
+        nav ul {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        nav ul li a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: color 0.3s ease;
+        }
+
+        nav ul li a:hover, .social-links a:hover {
+            color: var(--title-white);
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1.5rem;
+        }
+        
+        .social-links a {
+            color: var(--text-main);
+            font-size: 1.2rem;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        
+        .social-links a:hover {
+            transform: translateY(-2px);
+            color: #00f0ff;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 5%;
+            position: relative;
+            padding-top: 100px;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(5,5,7,0.1), var(--bg-dark)), 
+                        repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(255,255,255,0.02) 50px);
+            z-index: -1;
+        }
+
+        .hero p.subtitle {
+            color: #00f0ff;
+            font-weight: 600;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .hero h1 {
+            font-size: 4rem;
+            line-height: 1.1;
+            margin-bottom: 1rem;
+        }
+
+        .hero p.description {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin-bottom: 2.5rem;
+            color: #d0d0d0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 1rem 2rem;
+            background: transparent;
+            color: var(--title-white);
+            border: 1px solid var(--accent-border);
+            text-decoration: none;
+            font-weight: 600;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px var(--accent-glow);
+            margin-right: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn:hover {
+            background: rgba(0, 240, 255, 0.1);
+            box-shadow: 0 0 25px var(--accent-glow);
+            transform: translateY(-2px);
+        }
+
+        /* Sections */
+        section {
+            padding: 6rem 5%;
+        }
+
+        .section-header {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            display: inline-block;
+            border-bottom: 2px solid var(--accent-border);
+            padding-bottom: 0.5rem;
+        }
+
+        /* Grid Layouts */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+        }
+        
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+
+        /* Cards */
+        .card {
+            background: var(--card-bg);
+            border: 1px solid rgba(255,255,255,0.05);
+            padding: 2.5rem;
+            border-radius: 8px;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .card p {
+            margin-bottom: 1rem;
+            flex-grow: 1;
+        }
+
+        /* Tech Stack Badges */
+        .tech-category {
+            margin-bottom: 2rem;
+        }
+        
+        .tech-category h4 {
+            color: #00f0ff;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .tag {
+            background: rgba(255, 255, 255, 0.05);
+            color: #e0e0e0;
+            font-size: 0.9rem;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .tag i {
+            color: #00f0ff;
+        }
+
+        .tag:hover {
+            border-color: #00f0ff;
+            background: rgba(0, 240, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* Project Links */
+        .project-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #00f0ff;
+            text-decoration: none;
+            font-weight: 600;
+            margin-top: 1.5rem;
+            transition: color 0.3s ease;
+        }
+        
+        .project-link:hover {
+            color: var(--title-white);
+        }
+
+        /* Testimonials */
+        .testimonial {
+            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0, 240, 255, 0.02) 100%);
+            border-left: 4px solid #00f0ff;
+            padding: 2rem;
+            font-style: italic;
+            position: relative;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .testimonial .stars {
+            color: #ffd700;
+            margin-bottom: 1rem;
+            font-style: normal;
+        }
+        
+        .testimonial-author {
+            margin-top: 1.5rem;
+            font-style: normal;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 3rem 5%;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            margin-top: 4rem;
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.5rem; }
+            nav ul { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <a href="#" class="logo-container">M. IBRAHIM</a>
+        <ul>
+            <li><a href="#about">About</a></li>
+            <li><a href="#skills">Tech Stack</a></li>
+            <li><a href="#projects">Engineering</a></li>
+            <li><a href="#experience">Experience & Impact</a></li>
+        </ul>
+        <div class="social-links">
+            <a href="https://github.com/Mibrahim25-debug" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" title="Upwork"><i class="fa-solid fa-briefcase"></i></a>
+        </div>
+    </nav>
+
+    <header class="hero" id="about">
+        <p class="subtitle">Building Production-Ready AI Systems</p>
+        <h1>Muhammad Ibrahim Awan</h1>
+        <h2 class="white-title" style="margin-bottom: 1.5rem; font-size: 2rem; font-weight: 400; color: #e0e0e0;">Applied AI Engineer</h2>
+        <p class="description">
+            I mainly work with AI agents, LangChain, RAG, and Python backends. I don't just connect an AI model and call it done. I build the rest of the system around it too, including the retrieval, API, and database, so everything works together properly. My focus is on building AI systems that are actually reliable and usable in real projects.
+        </p>
+        <div>
+            <a href="#projects" class="btn"><i class="fa-solid fa-code"></i> View Projects</a>
+            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" class="btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+            <a href="https://github.com/Mibrahim25-debug" target="_blank" class="btn"><i class="fa-brands fa-github"></i> GitHub</a>
+            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" class="btn"><i class="fa-solid fa-briefcase"></i> Upwork</a>
+        </div>
+    </header>
+
+    <section id="skills">
+        <h2 class="section-header white-title">Comprehensive Tech Stack</h2>
+        
+        <div class="tech-category">
+            <h4>Languages & Core</h4>
+            <div class="tags">
+                <span class="tag"><i class="fa-brands fa-python"></i> Python</span>
+                <span class="tag"><i class="fa-solid fa-database"></i> SQL</span>
+                <span class="tag"><i class="fa-solid fa-code"></i> VS Code</span>
+            </div>
+        </div>
+
+        <div class="tech-category">
+            <h4>AI & Machine Learning</h4>
+            <div class="tags">
+                <span class="tag"><i class="fa-solid fa-brain"></i> Gen AI Backend</span>
+                <span class="tag"><i class="fa-solid fa-link"></i> LangChain</span>
+                <span class="tag"><i class="fa-solid fa-project-diagram"></i> LangGraph</span>
+                <span class="tag"><i class="fa-solid fa-robot"></i> AI Agents</span>
+                <span class="tag"><i class="fa-solid fa-magnifying-glass-chart"></i> RAG Pipelines</span>
+                <span class="tag"><i class="fa-solid fa-database"></i> Vector DBs (Chroma/Pinecone)</span>
+                <span class="tag"><i class="fa-solid fa-microchip"></i> Llama 3 / Groq</span>
+                <span class="tag"><i class="fa-solid fa-bolt"></i> OpenAI / Azure</span>
+                <span class="tag"><i class="fa-solid fa-face-smiling-hands"></i> Hugging Face</span>
+                <span class="tag"><i class="fa-solid fa-network-wired"></i> Semantic Search</span>
+            </div>
+        </div>
+
+        <div class="tech-category">
+            <h4>Backend, Data & Infrastructure</h4>
+            <div class="tags">
+                <span class="tag"><i class="fa-solid fa-server"></i> FastAPI</span>
+                <span class="tag"><i class="fa-solid fa-database"></i> PostgreSQL</span>
+                <span class="tag"><i class="fa-solid fa-database"></i> Redis</span>
+                <span class="tag"><i class="fa-solid fa-table"></i> SQLAlchemy / SQLite</span>
+                <span class="tag"><i class="fa-solid fa-chart-simple"></i> Pandas / ETL</span>
+                <span class="tag"><i class="fa-solid fa-gears"></i> REST APIs</span>
+                <span class="tag"><i class="fa-solid fa-layer-group"></i> Microservices</span>
+                <span class="tag"><i class="fa-brands fa-docker"></i> Docker</span>
+                <span class="tag"><i class="fa-brands fa-git-alt"></i> Git / GitHub</span>
+                <span class="tag"><i class="fa-solid fa-shield-halved"></i> OAuth2 / JWT Security</span>
+                <span class="tag"><i class="fa-solid fa-cloud"></i> AWS / Cloud</span>
+            </div>
+        </div>
+    </section>
+
+    <section id="projects">
+        <h2 class="section-header white-title">Engineering Portfolio</h2>
+        <div class="grid-2">
+            
+            <div class="card">
+                <h3 class="white-title">Veridian: Autonomous Real Estate Intelligence</h3>
+                <p>An enterprise PropTech pipeline combined with an autonomous, tool-using AI Analyst. It orchestrates the harvesting of unstructured global property listings using headless Playwright automation, normalizes them via a Pandas data warehouse, and stores them via SQLAlchemy. Features a Zero-Framework ReAct loop binding to Groq's Llama 3.3 70B, allowing the agent to route execution between SQL toolkits, live web gateways, and deterministic financial calculators. Served via a high-throughput FastAPI backend to a cinematic dark-theme Next.js dashboard.</p>
+                <div class="tags" style="margin-top: auto;">
+                    <span class="tag">FastAPI</span><span class="tag">Playwright</span><span class="tag">Llama 3.3</span><span class="tag">Pandas</span>
+                </div>
+                <a href="https://github.com/Mibrahim25-debug/Veridian-REAL-ESTATE-INTELLIGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+            </div>
+
+            <div class="card">
+                <h3 class="white-title">Aisle — AI Retail Intelligence Agent</h3>
+                <p>An autonomous AI analyst for e-commerce. Aisle ingests store data into a consolidated warehouse and places a multi-tool AI agent on top. Uses a native tool-calling loop (Groq/Llama 3) with 12 tools to forecast demand, recommend pricing, and segment customers (RFM analysis). Responses stream token-by-token to a premium Next.js dashboard with live KPIs and proactive stock alerts.</p>
+                <div class="tags" style="margin-top: auto;">
+                    <span class="tag">LangChain</span><span class="tag">Next.js</span><span class="tag">Groq</span><span class="tag">APScheduler</span>
+                </div>
+                <a href="https://github.com/Mibrahim25-debug/AISLE---RETAIL-AGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+            </div>
+
+            <div class="card">
+                <h3 class="white-title">Automated Competitor Price Tracker</h3>
+                <p>An end-to-end Data Engineering pipeline that automatically extracts e-commerce pricing data via Python Requests, normalizes and enforces strict typing using Pandas, and loads it into a relational SQLite database via SQLAlchemy. Exposes secure REST API endpoints via FastAPI to serve real-time analytics to a cinematic HTML/Tailwind/Chart.js frontend dashboard.</p>
+                <div class="tags" style="margin-top: auto;">
+                    <span class="tag">ETL Pipeline</span><span class="tag">FastAPI</span><span class="tag">Chart.js</span><span class="tag">SQLAlchemy</span>
+                </div>
+                <a href="https://github.com/Mibrahim25-debug/Competitor-Price-Tracker/tree/main" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+            </div>
+
+            <div class="card">
+                <h3 class="white-title">AI Web Scraping Agent (SSRF-Hardened)</h3>
+                <p>An autonomous agent taking plain-English instructions to extract validated JSON from any website. Uses a two-stage fetch architecture (direct request scaling to Bright Data proxy) to save costs. It dynamically generates extraction schemas at runtime and is fully SSRF-hardened by validating IPs against loopback and cloud-metadata ranges.</p>
+                <div class="tags" style="margin-top: auto;">
+                    <span class="tag">LangGraph</span><span class="tag">Security</span><span class="tag">Python</span>
+                </div>
+                <a href="https://github.com/Mibrahim25-debug/WEB-SCRAPING-AGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+            </div>
+
+            <div class="card">
+                <h3 class="white-title">MarketSync: Multi-Source ETL Pipeline</h3>
+                <p>Extracts live job market data from isolated sources (REST APIs, Web Scrapers via BeautifulSoup, static CSVs), cleans it with strict Pandas logic, and unifies it into a single PostgreSQL Data Warehouse. Served via FastAPI to a responsive Tailwind and Chart.js executive dashboard.</p>
+                <div class="tags" style="margin-top: auto;">
+                    <span class="tag">BeautifulSoup</span><span class="tag">PostgreSQL</span><span class="tag">FastAPI</span>
+                </div>
+                <a href="https://github.com/Mibrahim25-debug/Multi-Source-Data-Extraction-Pipeline-Jobs-Market-Analytics" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+            </div>
+            
+            <div class="card">
+                <h3 class="white-title">NASTP Air-Gapped Examination Network</h3>
+                <p>An enterprise-grade, offline Client-Server architecture for high-security aerospace facilities. Bypasses the cloud by establishing an asynchronous HTTP polling network over a local subnet. Features an automated Pandas ETL engine to ingest messy CSV question banks, threaded socket communication, and zero-downtime SQLite logging.</p>
+                <div class="tags" style="margin-top: auto;">
+                    <span class="tag">Sockets</span><span class="tag">PySide6 (GUI)</span><span class="tag">SQLite</span>
+                </div>
+                <a href="https://github.com/Mibrahim25-debug/Secure-Exam-Software-FOR-NASTP" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+            </div>
+            
+            <div class="card">
+                <h3 class="white-title">FastAPI Data Ingestion Engine (DaaS)</h3>
+                <p>Enterprise FastAPI backend for secure, high-concurrency asynchronous data processing. Implements strict OAuth2/JWT authentication, Alembic migrations, and Domain-Driven Design (DDD). Uses FastAPI BackgroundTasks and Pandas to process massive CSV workloads instantly without blocking the server thread.</p>
+                <div class="tags" style="margin-top: auto;">
+                    <span class="tag">OAuth2/JWT</span><span class="tag">Alembic</span><span class="tag">BackgroundTasks</span>
+                </div>
+                <a href="https://github.com/Mibrahim25-debug/FastAPI-Data-Ingestion-Engine-DaaS" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+            </div>
+
+        </div>
+    </section>
+
+    <section id="experience">
+        <h2 class="section-header white-title">Experience & Client Impact</h2>
+        
+        <div class="grid-2">
+            <!-- Professional Experience -->
+            <div>
+                <div class="card" style="margin-bottom: 2rem;">
+                    <h3 class="white-title">Freelance Applied AI Engineer <span style="font-size: 1rem; color: var(--text-main); font-weight: 400;">| Upwork (1 Year+)</span></h3>
+                    <p>Maintaining a 100% Job Success Score. Designed and delivered LLM agent orchestration systems, automated extraction pipelines, and robust APIs. Replaced manual reporting workflows with deterministic Python logic for global clients.</p>
+                </div>
+
+                <div class="card">
+                    <h3 class="white-title">AI Engineering Intern <span style="font-size: 1rem; color: var(--text-main); font-weight: 400;">| Inovaqo (4 Months)</span></h3>
+                    <p>Collaborated with the engineering team to optimize backend infrastructure using advanced Python and FastAPI. Cleaned datasets, wrote SQL queries, and gained hands-on commercial experience deploying scalable applications.</p>
+                </div>
+            </div>
+
+            <!-- Client Reviews -->
+            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                <div class="testimonial">
+                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    "Ibrahim delivered an exceptional piece of software architecture for our facility. We required a fully offline, examination network with zero internet connectivity due to strict security protocols. He engineered a flawless Python backend... highly recommended."
+                    <div class="testimonial-author">
+                        <strong class="white-title">AMSC PAC K.</strong> | Director of Training, NASTP
+                    </div>
+                </div>
+
+                <div class="testimonial">
+                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    "Ibrahim built exactly what we needed and delivered it on time. He took the time to understand our requirements before writing any code, which meant the agent worked properly from day one."
+                    <div class="testimonial-author">
+                        <strong class="white-title">Upwork Client</strong> | AI Agent Development (LangChain/RAG)
+                    </div>
+                </div>
+
+                <div class="testimonial">
+                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    "I have a great time working with Muhammad Ibrahim he is quick to the solution, fast, easily accessible... the work is delivered flawlessly."
+                    <div class="testimonial-author">
+                        <strong class="white-title">Upwork Client</strong> | Data Crawling & Web Scraping
+                    </div>
+                </div>
+                
+                <div class="testimonial">
+                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
+                    "Work was delivered exactly as we needed it. Passionate and eager to learn about the project scope, requirements and domain."
+                    <div class="testimonial-author">
+                        <strong class="white-title">Upwork Client</strong> | Senior Backend & AI Engineering
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="logo-container" style="display: inline-block; margin-bottom: 2rem;">M. IBRAHIM</div>
+        <div class="social-links" style="justify-content: center; margin-bottom: 2rem;">
+            <a href="https://github.com/Mibrahim25-debug" target="_blank"><i class="fa-brands fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+        </div>
+        <p class="white-title">Applied AI & Backend Engineer</p>
+        <p style="font-size: 0.9rem; margin-top: 1rem;">Building systems that run in production, not just in notebooks.</p>
+    </footer>
+
+</body>
+</html>
