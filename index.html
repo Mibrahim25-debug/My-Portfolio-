@@ -10,7 +10,7 @@
 
         :root {
             --bg-dark: #050507;
-            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-bg: rgba(10, 10, 15, 0.6);
             --accent-glow: rgba(0, 240, 255, 0.15);
             --accent-border: rgba(0, 240, 255, 0.3);
             --text-main: #a0a0a0;
@@ -31,10 +31,53 @@
             color: var(--text-main);
             line-height: 1.6;
             overflow-x: hidden;
-            background-image: 
-                radial-gradient(circle at 15% 50%, rgba(0, 255, 255, 0.03), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(128, 0, 255, 0.03), transparent 25%);
+            position: relative;
         }
+
+        /* --- NEW 3D ANIMATED BACKGROUND --- */
+        .bg-container {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            z-index: -2;
+            background-color: var(--bg-dark);
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        /* Floating Holographic Orbs */
+        .glow-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.4;
+            animation: float 15s infinite alternate ease-in-out;
+        }
+        .orb-1 { width: 50vw; height: 50vw; background: rgba(0, 240, 255, 0.15); top: -20%; left: -10%; animation-delay: 0s; }
+        .orb-2 { width: 40vw; height: 40vw; background: rgba(128, 0, 255, 0.12); bottom: -10%; right: -10%; animation-delay: -5s; }
+
+        /* 3D Moving Perspective Grid */
+        .grid-floor {
+            position: absolute;
+            bottom: -20%; left: -50%; width: 200%; height: 70%;
+            background-image: 
+                linear-gradient(rgba(0, 240, 255, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 240, 255, 0.2) 1px, transparent 1px);
+            background-size: 60px 60px;
+            transform: perspective(600px) rotateX(75deg);
+            animation: gridMove 10s linear infinite;
+            mask-image: linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
+        }
+
+        @keyframes gridMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 60px; }
+        }
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(40px, 40px); }
+        }
+        /* --------------------------------- */
 
         h1, h2, h3, h4, h5, h6, .white-title {
             color: var(--title-white);
@@ -46,13 +89,14 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 2rem 5%;
+            padding: 1.5rem 5%;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 100;
-            background: rgba(5, 5, 7, 0.8);
-            backdrop-filter: blur(10px);
+            background: rgba(5, 5, 7, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
@@ -102,24 +146,17 @@
             color: #00f0ff;
         }
 
-        /* Hero Section */
+        /* Hero Section - FIXED OVERLAP & REMOVED IMAGE */
         .hero {
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            padding: 0 5%;
+            align-items: center;
+            padding: 180px 5% 100px 5%; /* Increased top padding to fix the hidden text issue */
             position: relative;
-            padding-top: 100px;
         }
 
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(rgba(5,5,7,0.1), var(--bg-dark)), 
-                        repeating-linear-gradient(0deg, transparent, transparent 49px, rgba(255,255,255,0.02) 50px);
-            z-index: -1;
+        .hero-text {
+            max-width: 900px;
         }
 
         .hero p.subtitle {
@@ -131,13 +168,13 @@
         }
 
         .hero h1 {
-            font-size: 4rem;
+            font-size: 4.5rem;
             line-height: 1.1;
             margin-bottom: 1rem;
         }
 
         .hero p.description {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             max-width: 800px;
             margin-bottom: 2.5rem;
             color: #d0d0d0;
@@ -146,7 +183,8 @@
         .btn {
             display: inline-block;
             padding: 1rem 2rem;
-            background: transparent;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
             color: var(--title-white);
             border: 1px solid var(--accent-border);
             text-decoration: none;
@@ -167,6 +205,8 @@
         /* Sections */
         section {
             padding: 6rem 5%;
+            position: relative;
+            z-index: 10; /* Keeps content above the 3D background */
         }
 
         .section-header {
@@ -193,20 +233,32 @@
         /* Cards */
         .card {
             background: var(--card-bg);
-            border: 1px solid rgba(255,255,255,0.05);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.08);
             padding: 2.5rem;
             border-radius: 8px;
-            transition: transform 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
+        
+        .card-img {
+            width: 100%;
+            height: 220px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.05);
+            object-fit: cover;
+        }
 
         .card:hover {
             transform: translateY(-5px);
             border-color: var(--accent-border);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.1);
         }
 
         .card h3 {
@@ -257,34 +309,51 @@
 
         .tag:hover {
             border-color: #00f0ff;
-            background: rgba(0, 240, 255, 0.05);
+            background: rgba(0, 240, 255, 0.1);
             transform: translateY(-2px);
         }
 
-        /* Project Links */
+        /* Project Links & Actions */
+        .project-actions {
+            display: flex;
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        
         .project-link {
             display: inline-flex;
             align-items: center;
             gap: 0.5rem;
-            color: #00f0ff;
+            color: var(--text-main);
             text-decoration: none;
             font-weight: 600;
-            margin-top: 1.5rem;
             transition: color 0.3s ease;
         }
         
         .project-link:hover {
             color: var(--title-white);
         }
+        
+        .live-demo-btn {
+            color: #00f0ff;
+        }
+        
+        .live-demo-btn:hover {
+            color: #ffffff;
+            text-shadow: 0 0 10px var(--accent-glow);
+        }
 
         /* Testimonials */
         .testimonial {
-            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0, 240, 255, 0.02) 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0, 240, 255, 0.05) 100%);
+            backdrop-filter: blur(10px);
             border-left: 4px solid #00f0ff;
             padding: 2rem;
             font-style: italic;
             position: relative;
             border-radius: 0 8px 8px 0;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-left: 4px solid #00f0ff;
         }
         
         .testimonial .stars {
@@ -303,15 +372,25 @@
             padding: 3rem 5%;
             border-top: 1px solid rgba(255,255,255,0.05);
             margin-top: 4rem;
+            position: relative;
+            z-index: 10;
         }
 
         @media (max-width: 768px) {
-            .hero h1 { font-size: 2.5rem; }
+            .hero h1 { font-size: 3rem; }
             nav ul { display: none; }
+            .hero { padding-top: 150px; }
         }
     </style>
 </head>
 <body>
+
+    <!-- 3D ANIMATED BACKGROUND (Out of the box effect) -->
+    <div class="bg-container">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="grid-floor"></div>
+    </div>
 
     <nav>
         <a href="#" class="logo-container">M. IBRAHIM</a>
@@ -320,6 +399,7 @@
             <li><a href="#skills">Tech Stack</a></li>
             <li><a href="#projects">Engineering</a></li>
             <li><a href="#experience">Experience & Impact</a></li>
+            <li><a href="#contact" style="color: #00f0ff; font-weight: 600;">Contact</a></li>
         </ul>
         <div class="social-links">
             <a href="https://github.com/Mibrahim25-debug" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
@@ -329,17 +409,20 @@
     </nav>
 
     <header class="hero" id="about">
-        <p class="subtitle">Building Production-Ready AI Systems</p>
-        <h1>Muhammad Ibrahim Awan</h1>
-        <h2 class="white-title" style="margin-bottom: 1.5rem; font-size: 2rem; font-weight: 400; color: #e0e0e0;">Applied AI Engineer</h2>
-        <p class="description">
-            I mainly work with AI agents, LangChain, RAG, and Python backends. I don't just connect an AI model and call it done. I build the rest of the system around it too, including the retrieval, API, and database, so everything works together properly. My focus is on building AI systems that are actually reliable and usable in real projects.
-        </p>
-        <div>
-            <a href="#projects" class="btn"><i class="fa-solid fa-code"></i> View Projects</a>
-            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" class="btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
-            <a href="https://github.com/Mibrahim25-debug" target="_blank" class="btn"><i class="fa-brands fa-github"></i> GitHub</a>
-            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" class="btn"><i class="fa-solid fa-briefcase"></i> Upwork</a>
+        <div class="hero-text">
+            <!-- This subtitle is now fully visible, pushed down below the navbar -->
+            <p class="subtitle">Building Production-Ready AI Systems</p>
+            <h1>Muhammad Ibrahim Awan</h1>
+            <h2 class="white-title" style="margin-bottom: 1.5rem; font-size: 2rem; font-weight: 400; color: #e0e0e0;">Applied AI Engineer</h2>
+            <p class="description">
+                I mainly work with AI agents, LangChain, RAG, and Python backends. I don't just connect an AI model and call it done. I build the rest of the system around it too, including the retrieval, API, and database, so everything works together properly. My focus is on building AI systems that are actually reliable and usable in real projects.
+            </p>
+            <div>
+                <a href="#projects" class="btn"><i class="fa-solid fa-code"></i> View Projects</a>
+                <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" class="btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+                <a href="https://github.com/Mibrahim25-debug" target="_blank" class="btn"><i class="fa-brands fa-github"></i> GitHub</a>
+                <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" class="btn"><i class="fa-solid fa-briefcase"></i> Upwork</a>
+            </div>
         </div>
     </header>
 
@@ -394,66 +477,87 @@
         <div class="grid-2">
             
             <div class="card">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000" alt="Veridian Architecture" class="card-img">
                 <h3 class="white-title">Veridian: Autonomous Real Estate Intelligence</h3>
-                <p>An enterprise PropTech pipeline combined with an autonomous, tool-using AI Analyst. It orchestrates the harvesting of unstructured global property listings using headless Playwright automation, normalizes them via a Pandas data warehouse, and stores them via SQLAlchemy. Features a Zero-Framework ReAct loop binding to Groq's Llama 3.3 70B, allowing the agent to route execution between SQL toolkits, live web gateways, and deterministic financial calculators. Served via a high-throughput FastAPI backend to a cinematic dark-theme Next.js dashboard.</p>
+                <p>An enterprise PropTech pipeline combined with an autonomous, tool-using AI Analyst. It orchestrates the harvesting of unstructured global property listings using headless Playwright automation, normalizes them via a Pandas data warehouse, and stores them via SQLAlchemy. Features a Zero-Framework ReAct loop binding to Groq's Llama 3.3 70B, allowing the agent to route execution between SQL toolkits, live web gateways, and deterministic financial calculators.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">FastAPI</span><span class="tag">Playwright</span><span class="tag">Llama 3.3</span><span class="tag">Pandas</span>
                 </div>
-                <a href="https://github.com/Mibrahim25-debug/Veridian-REAL-ESTATE-INTELLIGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+                <div class="project-actions">
+                    <a href="https://github.com/Mibrahim25-debug/Veridian-REAL-ESTATE-INTELLIGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                </div>
             </div>
 
             <div class="card">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000" alt="Aisle Agent" class="card-img">
                 <h3 class="white-title">Aisle — AI Retail Intelligence Agent</h3>
-                <p>An autonomous AI analyst for e-commerce. Aisle ingests store data into a consolidated warehouse and places a multi-tool AI agent on top. Uses a native tool-calling loop (Groq/Llama 3) with 12 tools to forecast demand, recommend pricing, and segment customers (RFM analysis). Responses stream token-by-token to a premium Next.js dashboard with live KPIs and proactive stock alerts.</p>
+                <p>An autonomous AI analyst for e-commerce. Aisle ingests store data into a consolidated warehouse and places a multi-tool AI agent on top. Uses a native tool-calling loop (Groq/Llama 3) with 12 tools to forecast demand, recommend pricing, and segment customers (RFM analysis). Responses stream token-by-token to a premium Next.js dashboard.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">LangChain</span><span class="tag">Next.js</span><span class="tag">Groq</span><span class="tag">APScheduler</span>
                 </div>
-                <a href="https://github.com/Mibrahim25-debug/AISLE---RETAIL-AGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+                <div class="project-actions">
+                    <a href="https://github.com/Mibrahim25-debug/AISLE---RETAIL-AGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                </div>
             </div>
 
             <div class="card">
+                <img src="https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&q=80&w=1000" alt="Price Tracker" class="card-img">
                 <h3 class="white-title">Automated Competitor Price Tracker</h3>
-                <p>An end-to-end Data Engineering pipeline that automatically extracts e-commerce pricing data via Python Requests, normalizes and enforces strict typing using Pandas, and loads it into a relational SQLite database via SQLAlchemy. Exposes secure REST API endpoints via FastAPI to serve real-time analytics to a cinematic HTML/Tailwind/Chart.js frontend dashboard.</p>
+                <p>An end-to-end Data Engineering pipeline that automatically extracts e-commerce pricing data via Python Requests, normalizes and enforces strict typing using Pandas, and loads it into a relational SQLite database via SQLAlchemy. Exposes secure REST API endpoints via FastAPI to serve real-time analytics.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">ETL Pipeline</span><span class="tag">FastAPI</span><span class="tag">Chart.js</span><span class="tag">SQLAlchemy</span>
                 </div>
-                <a href="https://github.com/Mibrahim25-debug/Competitor-Price-Tracker/tree/main" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+                <div class="project-actions">
+                    <a href="https://github.com/Mibrahim25-debug/Competitor-Price-Tracker/tree/main" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it onGitHub</a>
+                </div>
             </div>
 
             <div class="card">
+                <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1000" alt="Web Scraping" class="card-img">
                 <h3 class="white-title">AI Web Scraping Agent (SSRF-Hardened)</h3>
-                <p>An autonomous agent taking plain-English instructions to extract validated JSON from any website. Uses a two-stage fetch architecture (direct request scaling to Bright Data proxy) to save costs. It dynamically generates extraction schemas at runtime and is fully SSRF-hardened by validating IPs against loopback and cloud-metadata ranges.</p>
+                <p>An autonomous agent taking plain-English instructions to extract validated JSON from any website. Uses a two-stage fetch architecture to save costs. It dynamically generates extraction schemas at runtime and is fully SSRF-hardened by validating IPs against loopback and cloud-metadata ranges.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">LangGraph</span><span class="tag">Security</span><span class="tag">Python</span>
                 </div>
-                <a href="https://github.com/Mibrahim25-debug/WEB-SCRAPING-AGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+                <div class="project-actions">
+                    <a href="https://github.com/Mibrahim25-debug/WEB-SCRAPING-AGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it on GitHub</a>
+                </div>
             </div>
 
             <div class="card">
+                <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1000" alt="MarketSync Pipeline" class="card-img">
                 <h3 class="white-title">MarketSync: Multi-Source ETL Pipeline</h3>
-                <p>Extracts live job market data from isolated sources (REST APIs, Web Scrapers via BeautifulSoup, static CSVs), cleans it with strict Pandas logic, and unifies it into a single PostgreSQL Data Warehouse. Served via FastAPI to a responsive Tailwind and Chart.js executive dashboard.</p>
+                <p>Extracts live job market data from isolated sources (REST APIs, Web Scrapers via BeautifulSoup, static CSVs), cleans it with strict Pandas logic, and unifies it into a single PostgreSQL Data Warehouse. Served via FastAPI to a responsive Tailwind dashboard.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">BeautifulSoup</span><span class="tag">PostgreSQL</span><span class="tag">FastAPI</span>
                 </div>
-                <a href="https://github.com/Mibrahim25-debug/Multi-Source-Data-Extraction-Pipeline-Jobs-Market-Analytics" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+                <div class="project-actions">
+                    <a href="https://github.com/Mibrahim25-debug/Multi-Source-Data-Extraction-Pipeline-Jobs-Market-Analytics" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it on GitHub</a>
+                </div>
             </div>
             
             <div class="card">
+                <img src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?auto=format&fit=crop&q=80&w=1000" alt="NASTP Exam Software" class="card-img">
                 <h3 class="white-title">NASTP Air-Gapped Examination Network</h3>
-                <p>An enterprise-grade, offline Client-Server architecture for high-security aerospace facilities. Bypasses the cloud by establishing an asynchronous HTTP polling network over a local subnet. Features an automated Pandas ETL engine to ingest messy CSV question banks, threaded socket communication, and zero-downtime SQLite logging.</p>
+                <p>An enterprise-grade, offline Client-Server architecture for high-security aerospace facilities. Bypasses the cloud by establishing an asynchronous HTTP polling network over a local subnet. Features an automated Pandas ETL engine to ingest messy CSV question banks.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">Sockets</span><span class="tag">PySide6 (GUI)</span><span class="tag">SQLite</span>
                 </div>
-                <a href="https://github.com/Mibrahim25-debug/Secure-Exam-Software-FOR-NASTP" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+                <div class="project-actions">
+                    <a href="https://github.com/Mibrahim25-debug/Secure-Exam-Software-FOR-NASTP" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it on GitHub</a>
+                </div>
             </div>
             
             <div class="card">
+                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=1000" alt="FastAPI Backend" class="card-img">
                 <h3 class="white-title">FastAPI Data Ingestion Engine (DaaS)</h3>
-                <p>Enterprise FastAPI backend for secure, high-concurrency asynchronous data processing. Implements strict OAuth2/JWT authentication, Alembic migrations, and Domain-Driven Design (DDD). Uses FastAPI BackgroundTasks and Pandas to process massive CSV workloads instantly without blocking the server thread.</p>
+                <p>Enterprise FastAPI backend for secure, high-concurrency asynchronous data processing. Implements strict OAuth2/JWT authentication, Alembic migrations, and Domain-Driven Design (DDD). Uses FastAPI BackgroundTasks and Pandas to process massive CSV workloads instantly.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">OAuth2/JWT</span><span class="tag">Alembic</span><span class="tag">BackgroundTasks</span>
                 </div>
-                <a href="https://github.com/Mibrahim25-debug/FastAPI-Data-Ingestion-Engine-DaaS" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+                <div class="project-actions">
+                    <a href="https://github.com/Mibrahim25-debug/FastAPI-Data-Ingestion-Engine-DaaS" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it on GitHub</a>
+                </div>
             </div>
 
         </div>
@@ -509,6 +613,22 @@
                         <strong class="white-title">Upwork Client</strong> | Senior Backend & AI Engineering
                     </div>
                 </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEW CONTACT SECTION -->
+    <section id="contact">
+        <h2 class="section-header white-title">Let's Build Together</h2>
+        <div class="card" style="text-align: center; max-width: 700px; margin: 0 auto; align-items: center;">
+            <h3 class="white-title" style="font-size: 2rem;">Ready to automate your workflows?</h3>
+            <p style="margin-bottom: 2rem; font-size: 1.1rem;">
+                I'm currently available for freelance projects and full-time opportunities. Whether you need a production-ready RAG system, an autonomous AI agent, or a complex ETL pipeline, let's talk about how we can build it.
+            </p>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
+                <!-- Replace with your actual email -->
+                <a href="mailto:your.email@example.com" class="btn"><i class="fa-solid fa-envelope"></i> Send an Email</a>
+                <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" class="btn" style="border-color: #14a800; color: #14a800;"><i class="fa-solid fa-briefcase"></i> Hire me on Upwork</a>
             </div>
         </div>
     </section>
