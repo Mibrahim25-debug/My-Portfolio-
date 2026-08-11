@@ -4,18 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Muhammad Ibrahim Awan | Applied AI Engineer</title>
+    <meta name="description" content="Applied AI Engineer building production LangChain, RAG and agent systems in Python.">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
         :root {
-            --bg-dark: #050507;
-            --card-bg: rgba(10, 10, 15, 0.6);
-            --accent-glow: rgba(0, 240, 255, 0.15);
-            --accent-border: rgba(0, 240, 255, 0.3);
-            --text-main: #a0a0a0;
+            --bg-dark: #06070A;
+            --card-bg: rgba(14, 16, 22, 0.55);
+            --accent: #00e5ff;
+            --accent-soft: rgba(0, 229, 255, 0.14);
+            --accent-border: rgba(0, 229, 255, 0.22);
+            --text-main: #9aa0ab;
+            --text-bright: #d6dae1;
             --title-white: #ffffff;
+            --hairline: rgba(255, 255, 255, 0.07);
             --logo-bg: #f8f9fa;
+
+            /* One shared max width. Without this the page stretches edge to edge
+               on a wide monitor, which is what made everything feel oversized. */
+            --shell: 1240px;
         }
 
         * {
@@ -23,414 +31,540 @@
             padding: 0;
             box-sizing: border-box;
             font-family: 'Space Grotesk', sans-serif;
-            scroll-behavior: smooth;
         }
+        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
 
         body {
             background-color: var(--bg-dark);
             color: var(--text-main);
-            line-height: 1.6;
+            font-size: 16px;
+            line-height: 1.62;
             overflow-x: hidden;
             position: relative;
         }
 
-        /* --- NEW 3D ANIMATED BACKGROUND --- */
+        /* ============================================================
+           BACKGROUND
+           Floating glow orbs over a 3D perspective grid floor - the look from
+           the live site. The grid is a flat plane rotated back in 3D space,
+           with its background-position scrolling to give the sense of the
+           plane travelling toward the viewer.
+           ============================================================ */
         .bg-container {
             position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
+            inset: 0;
             z-index: -2;
-            background-color: var(--bg-dark);
-            overflow: hidden;
             pointer-events: none;
+            overflow: hidden;
+            background-color: var(--bg-dark);
         }
 
-        /* Floating Holographic Orbs */
         .glow-orb {
             position: absolute;
             border-radius: 50%;
             filter: blur(100px);
             opacity: 0.4;
+            will-change: transform;
             animation: float 15s infinite alternate ease-in-out;
         }
-        .orb-1 { width: 50vw; height: 50vw; background: rgba(0, 240, 255, 0.15); top: -20%; left: -10%; animation-delay: 0s; }
-        .orb-2 { width: 40vw; height: 40vw; background: rgba(128, 0, 255, 0.12); bottom: -10%; right: -10%; animation-delay: -5s; }
+        .orb-1 {
+            width: 50vw; height: 50vw;
+            top: -20%; left: -10%;
+            background: rgba(0, 229, 255, 0.15);
+            animation-delay: 0s;
+        }
+        .orb-2 {
+            width: 40vw; height: 40vw;
+            bottom: -10%; right: -10%;
+            background: rgba(128, 0, 255, 0.12);
+            animation-delay: -5s;
+        }
+        @keyframes float {
+            0%   { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(40px, 40px, 0); }
+        }
 
-        /* 3D Moving Perspective Grid */
+        /* 3D perspective grid floor */
         .grid-floor {
             position: absolute;
-            bottom: -20%; left: -50%; width: 200%; height: 70%;
-            background-image: 
-                linear-gradient(rgba(0, 240, 255, 0.2) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 240, 255, 0.2) 1px, transparent 1px);
+            bottom: -20%; left: -50%;
+            width: 200%; height: 70%;
+            background-image:
+                linear-gradient(rgba(0, 229, 255, 0.2) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 229, 255, 0.2) 1px, transparent 1px);
             background-size: 60px 60px;
             transform: perspective(600px) rotateX(75deg);
             animation: gridMove 10s linear infinite;
-            mask-image: linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
             -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
+            mask-image: linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
         }
-
         @keyframes gridMove {
-            0% { background-position: 0 0; }
+            0%   { background-position: 0 0; }
             100% { background-position: 0 60px; }
         }
-        @keyframes float {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(40px, 40px); }
+
+        /* Kept from the refined version: grain breaks up the colour banding
+           that large flat dark areas produce on most panels. Very low opacity,
+           so it reads as texture rather than as an effect. */
+        .bg-grain {
+            position: absolute;
+            inset: -50%;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+            opacity: 0.028;
+            mix-blend-mode: overlay;
+            will-change: transform;
+            animation: grain 7s steps(5) infinite;
         }
-        /* --------------------------------- */
+        @keyframes grain {
+            0%   { transform: translate3d(0, 0, 0); }
+            25%  { transform: translate3d(-2%, 1.5%, 0); }
+            50%  { transform: translate3d(1.5%, -2%, 0); }
+            75%  { transform: translate3d(-1.5%, -1%, 0); }
+            100% { transform: translate3d(0, 0, 0); }
+        }
 
         h1, h2, h3, h4, h5, h6, .white-title {
             color: var(--title-white);
-            font-weight: 700;
+            font-weight: 600;
+            letter-spacing: -0.015em;
         }
 
-        /* Navigation */
+        /* ---------------------------------------------------- NAV --- */
         nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 1.5rem 5%;
+            gap: 1.5rem;
+            padding: 0.9rem 2.2rem;
             position: fixed;
             width: 100%;
             top: 0;
             z-index: 100;
-            background: rgba(5, 5, 7, 0.7);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(6, 7, 10, 0.72);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.3s ease, background 0.3s ease;
         }
+        nav.scrolled { border-bottom-color: var(--hairline); }
 
         .logo-container {
             background-color: var(--logo-bg);
-            color: #050507;
-            padding: 0.5rem 1.2rem;
+            color: #06070A;
+            padding: 0.4rem 0.9rem;
             border-radius: 4px;
             font-weight: 700;
-            font-size: 1.2rem;
-            letter-spacing: 1px;
+            font-size: 1rem;
+            letter-spacing: 0.06em;
             text-decoration: none;
-            box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
         }
 
-        nav ul {
-            display: flex;
-            gap: 2rem;
-            list-style: none;
-            align-items: center;
-        }
-
+        nav ul { display: flex; gap: 1.7rem; list-style: none; align-items: center; }
         nav ul li a {
             color: var(--text-main);
             text-decoration: none;
-            font-size: 0.9rem;
-            transition: color 0.3s ease;
+            font-size: 0.92rem;
+            position: relative;
+            transition: color 0.25s ease;
         }
+        nav ul li a::after {
+            content: '';
+            position: absolute; left: 0; right: 0; bottom: -5px;
+            height: 1px; background: var(--accent);
+            transform: scaleX(0); transform-origin: right;
+            transition: transform 0.32s ease;
+        }
+        nav ul li a:hover { color: var(--title-white); }
+        nav ul li a:hover::after { transform: scaleX(1); transform-origin: left; }
 
-        nav ul li a:hover, .social-links a:hover {
-            color: var(--title-white);
-        }
-
-        .social-links {
-            display: flex;
-            gap: 1.5rem;
-        }
-        
+        .social-links { display: flex; gap: 1.1rem; }
         .social-links a {
             color: var(--text-main);
-            font-size: 1.2rem;
-            transition: color 0.3s ease, transform 0.3s ease;
+            font-size: 1rem;
+            transition: color 0.25s ease, transform 0.25s ease;
         }
-        
-        .social-links a:hover {
-            transform: translateY(-2px);
-            color: #00f0ff;
-        }
+        .social-links a:hover { color: var(--accent); transform: translateY(-2px); }
 
-        /* Hero Section - FIXED OVERLAP & REMOVED IMAGE */
+        /* ---------------------------------------------------- HERO --- */
         .hero {
             min-height: 100vh;
             display: flex;
             align-items: center;
-            padding: 180px 5% 100px 5%; /* Increased top padding to fix the hidden text issue */
-            position: relative;
+            padding: 130px 2.2rem 80px;
         }
 
-        .hero-text {
-            max-width: 900px;
+        .hero-inner {
+            width: 100%;
+            max-width: var(--shell);
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1.25fr 0.75fr;
+            gap: 3.5rem;
+            align-items: center;
         }
 
         .hero p.subtitle {
-            color: #00f0ff;
-            font-weight: 600;
-            letter-spacing: 2px;
+            color: var(--accent);
+            font-weight: 500;
+            font-size: 0.82rem;
+            letter-spacing: 0.22em;
             margin-bottom: 1rem;
             text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+        .hero p.subtitle::before {
+            content: '';
+            width: 26px; height: 1px;
+            background: var(--accent);
+            flex: none;
         }
 
         .hero h1 {
-            font-size: 4.5rem;
-            line-height: 1.1;
-            margin-bottom: 1rem;
+            font-size: clamp(2.7rem, 5.2vw, 3.9rem);
+            line-height: 1.06;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        .hero .role {
+            font-size: clamp(1.15rem, 2.2vw, 1.5rem);
+            font-weight: 400;
+            color: var(--text-bright);
+            margin-bottom: 1.3rem;
+            letter-spacing: 0;
         }
 
         .hero p.description {
-            font-size: 1.25rem;
-            max-width: 800px;
-            margin-bottom: 2.5rem;
-            color: #d0d0d0;
+            font-size: 1.07rem;
+            max-width: 54ch;
+            margin-bottom: 2.2rem;
+            color: var(--text-main);
         }
+
+        .hero-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; }
 
         .btn {
-            display: inline-block;
-            padding: 1rem 2rem;
-            background: rgba(0, 0, 0, 0.4);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.55rem;
+            padding: 0.78rem 1.4rem;
+            background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
-            color: var(--title-white);
-            border: 1px solid var(--accent-border);
+            color: var(--text-bright);
+            border: 1px solid var(--hairline);
             text-decoration: none;
-            font-weight: 600;
-            border-radius: 4px;
-            transition: all 0.3s ease;
-            box-shadow: 0 0 15px var(--accent-glow);
-            margin-right: 1rem;
-            margin-bottom: 1rem;
+            font-weight: 500;
+            font-size: 0.93rem;
+            border-radius: 7px;
+            transition: all 0.25s ease;
         }
-
         .btn:hover {
-            background: rgba(0, 240, 255, 0.1);
-            box-shadow: 0 0 25px var(--accent-glow);
+            background: var(--accent-soft);
+            border-color: var(--accent-border);
+            color: var(--title-white);
             transform: translateY(-2px);
         }
+        .btn.primary {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #04121a;
+            font-weight: 600;
+        }
+        .btn.primary:hover {
+            background: #4defff;
+            border-color: #4defff;
+            color: #04121a;
+        }
 
-        /* Sections */
-        section {
-            padding: 6rem 5%;
+        /* ------------------------------------------------ PORTRAIT --- */
+        .hero-visual { display: flex; justify-content: center; }
+
+        .portrait {
             position: relative;
-            z-index: 10; /* Keeps content above the 3D background */
+            width: min(400px, 80vw);
+            aspect-ratio: 1;
+            display: grid;
+            place-items: center;
+        }
+
+        /* <picture> is an inline wrapper with no size of its own - it derives
+           its width from the image inside it. Sizing the img as a percentage of
+           it is therefore circular, which is what pushed the photo off-centre.
+           display:contents removes the wrapper from layout entirely so the img
+           becomes the grid item and centres against .portrait directly. */
+        .portrait picture { display: contents; }
+
+        /* Soft light behind the head. Kept tight to the portrait so it reads
+           as a halo rather than a separate glowing shape. */
+        .portrait::before {
+            content: '';
+            position: absolute;
+            inset: 11%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 50% 45%, rgba(0,229,255,0.20), transparent 68%);
+            filter: blur(34px);
+        }
+
+        .portrait__img {
+            position: relative;
+            grid-area: 1 / 1;
+            width: 82%;
+            height: 82%;
+            object-fit: cover;
+            object-position: center 42%;
+            border-radius: 50%;
+            z-index: 2;
+            /* The ring lives ON the photo edge, as stacked box-shadows, rather
+               than as a separate element sitting outside it. That gap was what
+               made the old ring read as a floating oval instead of a frame. */
+            box-shadow:
+                0 0 0 1px rgba(255, 255, 255, 0.16),
+                0 0 0 7px rgba(255, 255, 255, 0.035),
+                0 0 0 8px rgba(0, 229, 255, 0.10),
+                0 18px 50px rgba(0, 0, 0, 0.55),
+                0 0 60px rgba(0, 229, 255, 0.13);
+        }
+
+        @media (max-width: 900px) {
+            .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+            .hero-visual { order: -1; }
+            .portrait { width: min(300px, 70vw); }
+        }
+
+        /* ------------------------------------------------ SECTIONS --- */
+        section {
+            padding: 5rem 2.2rem;
+            position: relative;
+            z-index: 10;
+            max-width: var(--shell);
+            margin: 0 auto;
         }
 
         .section-header {
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            display: inline-block;
-            border-bottom: 2px solid var(--accent-border);
-            padding-bottom: 0.5rem;
+            font-size: clamp(1.75rem, 3.4vw, 2.35rem);
+            margin-bottom: 2.2rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.85rem;
+            font-weight: 600;
+        }
+        .section-header::before {
+            content: '';
+            width: 22px; height: 2px;
+            background: var(--accent);
+            flex: none;
         }
 
-        /* Grid Layouts */
-        .grid-2 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
-            gap: 2rem;
-        }
-        
-        .grid-3 {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 2rem;
-        }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.3rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.3rem; }
 
-        /* Cards */
+        /* ---------------------------------------------------- CARDS --- */
         .card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.08);
-            padding: 2.5rem;
-            border-radius: 8px;
+            border: 1px solid var(--hairline);
+            padding: 1.75rem;
+            border-radius: 11px;
             transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
-        
+        .card::after {
+            content: '';
+            position: absolute; inset: 0;
+            border-radius: 10px;
+            background: linear-gradient(140deg, rgba(0,229,255,0.06), transparent 42%);
+            opacity: 0;
+            transition: opacity 0.35s ease;
+            pointer-events: none;
+        }
+        .card:hover { transform: translateY(-4px); border-color: var(--accent-border); }
+        .card:hover::after { opacity: 1; }
+
         .card-img {
             width: 100%;
-            height: 220px;
+            height: 180px;
             background: rgba(0,0,0,0.5);
-            border-radius: 4px;
-            margin-bottom: 1.5rem;
-            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 7px;
+            margin-bottom: 1.1rem;
+            border: 1px solid var(--hairline);
             object-fit: cover;
+            filter: saturate(0.75) contrast(1.05);
+            transition: filter 0.4s ease;
         }
+        .card:hover .card-img { filter: saturate(1) contrast(1.05); }
 
-        .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-border);
-            box-shadow: 0 10px 40px rgba(0, 240, 255, 0.1);
-        }
+        .card h3 { font-size: 1.18rem; margin-bottom: 0.6rem; line-height: 1.3; }
+        .card p { margin-bottom: 1rem; flex-grow: 1; font-size: 0.95rem; }
 
-        .card h3 {
-            font-size: 1.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .card p {
-            margin-bottom: 1rem;
-            flex-grow: 1;
-        }
-
-        /* Tech Stack Badges */
-        .tech-category {
-            margin-bottom: 2rem;
-        }
-        
+        /* ---------------------------------------------- TECH STACK --- */
+        .tech-category { margin-bottom: 1.6rem; }
         .tech-category h4 {
-            color: #00f0ff;
-            margin-bottom: 1rem;
-            font-size: 1.1rem;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+            font-size: 0.78rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.16em;
+            font-weight: 600;
         }
-
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.8rem;
-        }
-
+        .tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
         .tag {
-            background: rgba(255, 255, 255, 0.05);
-            color: #e0e0e0;
-            font-size: 0.9rem;
-            padding: 0.5rem 1rem;
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.1);
-            display: flex;
+            background: rgba(255, 255, 255, 0.035);
+            color: var(--text-bright);
+            font-size: 0.84rem;
+            padding: 0.42rem 0.8rem;
+            border-radius: 5px;
+            border: 1px solid var(--hairline);
+            display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
+            gap: 0.4rem;
+            transition: all 0.25s ease;
         }
-        
-        .tag i {
-            color: #00f0ff;
-        }
-
+        .tag i { color: var(--accent); font-size: 0.8em; }
         .tag:hover {
-            border-color: #00f0ff;
-            background: rgba(0, 240, 255, 0.1);
+            border-color: var(--accent-border);
+            background: var(--accent-soft);
             transform: translateY(-2px);
         }
 
-        /* Project Links & Actions */
-        .project-actions {
-            display: flex;
-            gap: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        
+        /* -------------------------------------------------- LINKS --- */
+        .project-actions { display: flex; gap: 1.2rem; margin-top: 1.1rem; }
         .project-link {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 0.45rem;
             color: var(--text-main);
             text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: color 0.25s ease;
         }
-        
-        .project-link:hover {
-            color: var(--title-white);
-        }
-        
-        .live-demo-btn {
-            color: #00f0ff;
-        }
-        
-        .live-demo-btn:hover {
-            color: #ffffff;
-            text-shadow: 0 0 10px var(--accent-glow);
-        }
+        .project-link:hover { color: var(--accent); }
 
-        /* Testimonials */
+        /* -------------------------------------------- TESTIMONIALS --- */
         .testimonial {
-            background: linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(0, 240, 255, 0.05) 100%);
+            background: rgba(255,255,255,0.022);
             backdrop-filter: blur(10px);
-            border-left: 4px solid #00f0ff;
-            padding: 2rem;
+            padding: 1.3rem 1.4rem;
             font-style: italic;
-            position: relative;
-            border-radius: 0 8px 8px 0;
-            border: 1px solid rgba(255,255,255,0.05);
-            border-left: 4px solid #00f0ff;
+            font-size: 0.95rem;
+            border-radius: 0 9px 9px 0;
+            border: 1px solid var(--hairline);
+            border-left: 3px solid var(--accent);
+            transition: border-color 0.3s ease, background 0.3s ease;
         }
-        
-        .testimonial .stars {
-            color: #ffd700;
-            margin-bottom: 1rem;
-            font-style: normal;
-        }
-        
-        .testimonial-author {
-            margin-top: 1.5rem;
-            font-style: normal;
-        }
+        .testimonial:hover { background: rgba(255,255,255,0.04); }
+        .testimonial .stars { color: #ffd45e; margin-bottom: 0.7rem; font-style: normal; font-size: 0.78rem; letter-spacing: 0.1em; }
+        .testimonial-author { margin-top: 1rem; font-style: normal; font-size: 0.84rem; }
 
+        /* ------------------------------------------------- FOOTER --- */
         .footer {
             text-align: center;
-            padding: 3rem 5%;
-            border-top: 1px solid rgba(255,255,255,0.05);
-            margin-top: 4rem;
+            padding: 2.6rem 2.2rem;
+            border-top: 1px solid var(--hairline);
+            margin-top: 2.5rem;
             position: relative;
             z-index: 10;
         }
+        .footer p { font-size: 0.86rem; }
 
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 3rem; }
+        /* ------------------------------------------------ REVEAL --- */
+        .reveal {
+            opacity: 0;
+            transform: translateY(16px);
+            transition: opacity 0.7s cubic-bezier(.2,.9,.3,1), transform 0.7s cubic-bezier(.2,.9,.3,1);
+        }
+        .reveal.in { opacity: 1; transform: none; }
+
+        :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+        @media (max-width: 860px) {
             nav ul { display: none; }
-            .hero { padding-top: 150px; }
+            nav { padding: 0.8rem 1.2rem; }
+            section { padding: 3.2rem 1.2rem; }
+            .hero { padding: 110px 1.2rem 60px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
+            .reveal { opacity: 1; transform: none; }
+            /* Hold the orbs at a settled offset rather than wherever frame one
+               happened to land, and stop the floor and grain moving. */
+            .orb-1 { transform: translate3d(20px, 20px, 0); }
+            .orb-2 { transform: translate3d(-14px, 14px, 0); }
+            .grid-floor, .bg-grain { animation: none; }
         }
     </style>
 </head>
 <body>
 
-    <!-- 3D ANIMATED BACKGROUND (Out of the box effect) -->
     <div class="bg-container">
         <div class="glow-orb orb-1"></div>
         <div class="glow-orb orb-2"></div>
         <div class="grid-floor"></div>
+        <div class="bg-grain"></div>
     </div>
 
-    <nav>
+    <nav id="nav">
         <a href="#" class="logo-container">M. IBRAHIM</a>
         <ul>
             <li><a href="#about">About</a></li>
             <li><a href="#skills">Tech Stack</a></li>
             <li><a href="#projects">Engineering</a></li>
-            <li><a href="#experience">Experience & Impact</a></li>
-            <li><a href="#contact" style="color: #00f0ff; font-weight: 600;">Contact</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#contact" style="color: var(--accent); font-weight: 600;">Contact</a></li>
         </ul>
         <div class="social-links">
-            <a href="https://github.com/Mibrahim25-debug" target="_blank" title="GitHub"><i class="fa-brands fa-github"></i></a>
-            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
-            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" title="Upwork"><i class="fa-solid fa-briefcase"></i></a>
+            <a href="https://github.com/Mibrahim25-debug" target="_blank" rel="noopener" title="GitHub"><i class="fa-brands fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" rel="noopener" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener" title="Upwork"><i class="fa-solid fa-briefcase"></i></a>
         </div>
     </nav>
 
     <header class="hero" id="about">
-        <div class="hero-text">
-            <!-- This subtitle is now fully visible, pushed down below the navbar -->
-            <p class="subtitle">Building Production-Ready AI Systems</p>
-            <h1>Muhammad Ibrahim Awan</h1>
-            <h2 class="white-title" style="margin-bottom: 1.5rem; font-size: 2rem; font-weight: 400; color: #e0e0e0;">Applied AI Engineer</h2>
-            <p class="description">
-                I mainly work with AI agents, LangChain, RAG, and Python backends. I don't just connect an AI model and call it done. I build the rest of the system around it too, including the retrieval, API, and database, so everything works together properly. My focus is on building AI systems that are actually reliable and usable in real projects.
-            </p>
-            <div>
-                <a href="#projects" class="btn"><i class="fa-solid fa-code"></i> View Projects</a>
-                <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" class="btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
-                <a href="https://github.com/Mibrahim25-debug" target="_blank" class="btn"><i class="fa-brands fa-github"></i> GitHub</a>
-                <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" class="btn"><i class="fa-solid fa-briefcase"></i> Upwork</a>
+        <div class="hero-inner">
+
+            <div class="hero-text">
+                <p class="subtitle">Building Production-Ready AI Systems</p>
+                <h1>Muhammad Ibrahim Awan</h1>
+                <p class="role">Applied AI Engineer</p>
+                <p class="description">
+                    I mainly work with AI agents, LangChain, RAG, and Python backends. I don't just connect an AI model and call it done. I build the rest of the system around it too, including the retrieval, API, and database, so everything works together properly. My focus is on building AI systems that are actually reliable and usable in real projects.
+                </p>
+                <div class="hero-actions">
+                    <a href="#projects" class="btn primary"><i class="fa-solid fa-code"></i> View Projects</a>
+                    <a href="https://github.com/Mibrahim25-debug" target="_blank" rel="noopener" class="btn"><i class="fa-brands fa-github"></i> GitHub</a>
+                    <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" rel="noopener" class="btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
+                    <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener" class="btn"><i class="fa-solid fa-briefcase"></i> Upwork</a>
+                </div>
             </div>
+
+            <div class="hero-visual">
+                <div class="portrait">
+                    <picture>
+                        <source srcset="profile.webp" type="image/webp">
+                        <img src="profile.jpg" alt="Muhammad Ibrahim Awan" class="portrait__img" width="720" height="720">
+                    </picture>
+                </div>
+            </div>
+
         </div>
     </header>
 
     <section id="skills">
-        <h2 class="section-header white-title">Comprehensive Tech Stack</h2>
-        
-        <div class="tech-category">
-            <h4>Languages & Core</h4>
+        <h2 class="section-header white-title reveal">Comprehensive Tech Stack</h2>
+
+        <div class="tech-category reveal">
+            <h4>Languages &amp; Core</h4>
             <div class="tags">
                 <span class="tag"><i class="fa-brands fa-python"></i> Python</span>
                 <span class="tag"><i class="fa-solid fa-database"></i> SQL</span>
@@ -438,28 +572,28 @@
             </div>
         </div>
 
-        <div class="tech-category">
-            <h4>AI & Machine Learning</h4>
+        <div class="tech-category reveal">
+            <h4>AI &amp; Machine Learning</h4>
             <div class="tags">
                 <span class="tag"><i class="fa-solid fa-brain"></i> Gen AI Backend</span>
                 <span class="tag"><i class="fa-solid fa-link"></i> LangChain</span>
-                <span class="tag"><i class="fa-solid fa-project-diagram"></i> LangGraph</span>
+                <span class="tag"><i class="fa-solid fa-diagram-project"></i> LangGraph</span>
                 <span class="tag"><i class="fa-solid fa-robot"></i> AI Agents</span>
                 <span class="tag"><i class="fa-solid fa-magnifying-glass-chart"></i> RAG Pipelines</span>
                 <span class="tag"><i class="fa-solid fa-database"></i> Vector DBs (Chroma/Pinecone)</span>
                 <span class="tag"><i class="fa-solid fa-microchip"></i> Llama 3 / Groq</span>
                 <span class="tag"><i class="fa-solid fa-bolt"></i> OpenAI / Azure</span>
-                <span class="tag"><i class="fa-solid fa-face-smiling-hands"></i> Hugging Face</span>
+                <span class="tag"><i class="fa-solid fa-cube"></i> Hugging Face</span>
                 <span class="tag"><i class="fa-solid fa-network-wired"></i> Semantic Search</span>
             </div>
         </div>
 
-        <div class="tech-category">
-            <h4>Backend, Data & Infrastructure</h4>
+        <div class="tech-category reveal">
+            <h4>Backend, Data &amp; Infrastructure</h4>
             <div class="tags">
                 <span class="tag"><i class="fa-solid fa-server"></i> FastAPI</span>
                 <span class="tag"><i class="fa-solid fa-database"></i> PostgreSQL</span>
-                <span class="tag"><i class="fa-solid fa-database"></i> Redis</span>
+                <span class="tag"><i class="fa-solid fa-bolt"></i> Redis</span>
                 <span class="tag"><i class="fa-solid fa-table"></i> SQLAlchemy / SQLite</span>
                 <span class="tag"><i class="fa-solid fa-chart-simple"></i> Pandas / ETL</span>
                 <span class="tag"><i class="fa-solid fa-gears"></i> REST APIs</span>
@@ -473,90 +607,90 @@
     </section>
 
     <section id="projects">
-        <h2 class="section-header white-title">Engineering Portfolio</h2>
+        <h2 class="section-header white-title reveal">Engineering Portfolio</h2>
         <div class="grid-2">
-            
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000" alt="Veridian Architecture" class="card-img">
+
+            <div class="card reveal">
+                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
                 <h3 class="white-title">Veridian: Autonomous Real Estate Intelligence</h3>
                 <p>An enterprise PropTech pipeline combined with an autonomous, tool-using AI Analyst. It orchestrates the harvesting of unstructured global property listings using headless Playwright automation, normalizes them via a Pandas data warehouse, and stores them via SQLAlchemy. Features a Zero-Framework ReAct loop binding to Groq's Llama 3.3 70B, allowing the agent to route execution between SQL toolkits, live web gateways, and deterministic financial calculators.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">FastAPI</span><span class="tag">Playwright</span><span class="tag">Llama 3.3</span><span class="tag">Pandas</span>
                 </div>
                 <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/Veridian-REAL-ESTATE-INTELLIGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                    <a href="https://github.com/Mibrahim25-debug/Veridian-REAL-ESTATE-INTELLIGENT" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
                 </div>
             </div>
 
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000" alt="Aisle Agent" class="card-img">
+            <div class="card reveal">
+                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
                 <h3 class="white-title">Aisle — AI Retail Intelligence Agent</h3>
                 <p>An autonomous AI analyst for e-commerce. Aisle ingests store data into a consolidated warehouse and places a multi-tool AI agent on top. Uses a native tool-calling loop (Groq/Llama 3) with 12 tools to forecast demand, recommend pricing, and segment customers (RFM analysis). Responses stream token-by-token to a premium Next.js dashboard.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">LangChain</span><span class="tag">Next.js</span><span class="tag">Groq</span><span class="tag">APScheduler</span>
                 </div>
                 <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/AISLE---RETAIL-AGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> GitHub</a>
+                    <a href="https://github.com/Mibrahim25-debug/AISLE---RETAIL-AGENT" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
                 </div>
             </div>
 
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&q=80&w=1000" alt="Price Tracker" class="card-img">
-                <h3 class="white-title">Automated Competitor Price Tracker</h3>
-                <p>An end-to-end Data Engineering pipeline that automatically extracts e-commerce pricing data via Python Requests, normalizes and enforces strict typing using Pandas, and loads it into a relational SQLite database via SQLAlchemy. Exposes secure REST API endpoints via FastAPI to serve real-time analytics.</p>
-                <div class="tags" style="margin-top: auto;">
-                    <span class="tag">ETL Pipeline</span><span class="tag">FastAPI</span><span class="tag">Chart.js</span><span class="tag">SQLAlchemy</span>
-                </div>
-                <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/Competitor-Price-Tracker/tree/main" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it onGitHub</a>
-                </div>
-            </div>
-
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1000" alt="Web Scraping" class="card-img">
+            <div class="card reveal">
+                <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
                 <h3 class="white-title">AI Web Scraping Agent (SSRF-Hardened)</h3>
                 <p>An autonomous agent taking plain-English instructions to extract validated JSON from any website. Uses a two-stage fetch architecture to save costs. It dynamically generates extraction schemas at runtime and is fully SSRF-hardened by validating IPs against loopback and cloud-metadata ranges.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">LangGraph</span><span class="tag">Security</span><span class="tag">Python</span>
                 </div>
                 <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/WEB-SCRAPING-AGENT" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it on GitHub</a>
+                    <a href="https://github.com/Mibrahim25-debug/WEB-SCRAPING-AGENT" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
                 </div>
             </div>
 
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1000" alt="MarketSync Pipeline" class="card-img">
-                <h3 class="white-title">MarketSync: Multi-Source ETL Pipeline</h3>
-                <p>Extracts live job market data from isolated sources (REST APIs, Web Scrapers via BeautifulSoup, static CSVs), cleans it with strict Pandas logic, and unifies it into a single PostgreSQL Data Warehouse. Served via FastAPI to a responsive Tailwind dashboard.</p>
-                <div class="tags" style="margin-top: auto;">
-                    <span class="tag">BeautifulSoup</span><span class="tag">PostgreSQL</span><span class="tag">FastAPI</span>
-                </div>
-                <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/Multi-Source-Data-Extraction-Pipeline-Jobs-Market-Analytics" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it on GitHub</a>
-                </div>
-            </div>
-            
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?auto=format&fit=crop&q=80&w=1000" alt="NASTP Exam Software" class="card-img">
+            <div class="card reveal">
+                <img src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
                 <h3 class="white-title">NASTP Air-Gapped Examination Network</h3>
                 <p>An enterprise-grade, offline Client-Server architecture for high-security aerospace facilities. Bypasses the cloud by establishing an asynchronous HTTP polling network over a local subnet. Features an automated Pandas ETL engine to ingest messy CSV question banks.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">Sockets</span><span class="tag">PySide6 (GUI)</span><span class="tag">SQLite</span>
                 </div>
                 <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/Secure-Exam-Software-FOR-NASTP" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it on GitHub</a>
+                    <a href="https://github.com/Mibrahim25-debug/Secure-Exam-Software-FOR-NASTP" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
                 </div>
             </div>
-            
-            <div class="card">
-                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=1000" alt="FastAPI Backend" class="card-img">
+
+            <div class="card reveal">
+                <img src="https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
+                <h3 class="white-title">Automated Competitor Price Tracker</h3>
+                <p>An end-to-end Data Engineering pipeline that automatically extracts e-commerce pricing data via Python Requests, normalizes and enforces strict typing using Pandas, and loads it into a relational SQLite database via SQLAlchemy. Exposes secure REST API endpoints via FastAPI to serve real-time analytics.</p>
+                <div class="tags" style="margin-top: auto;">
+                    <span class="tag">ETL Pipeline</span><span class="tag">FastAPI</span><span class="tag">Chart.js</span><span class="tag">SQLAlchemy</span>
+                </div>
+                <div class="project-actions">
+                    <a href="https://github.com/Mibrahim25-debug/Competitor-Price-Tracker/tree/main" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+                </div>
+            </div>
+
+            <div class="card reveal">
+                <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
+                <h3 class="white-title">MarketSync: Multi-Source ETL Pipeline</h3>
+                <p>Extracts live job market data from isolated sources (REST APIs, Web Scrapers via BeautifulSoup, static CSVs), cleans it with strict Pandas logic, and unifies it into a single PostgreSQL Data Warehouse. Served via FastAPI to a responsive Tailwind dashboard.</p>
+                <div class="tags" style="margin-top: auto;">
+                    <span class="tag">BeautifulSoup</span><span class="tag">PostgreSQL</span><span class="tag">FastAPI</span>
+                </div>
+                <div class="project-actions">
+                    <a href="https://github.com/Mibrahim25-debug/Multi-Source-Data-Extraction-Pipeline-Jobs-Market-Analytics" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
+                </div>
+            </div>
+
+            <div class="card reveal">
+                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
                 <h3 class="white-title">FastAPI Data Ingestion Engine (DaaS)</h3>
                 <p>Enterprise FastAPI backend for secure, high-concurrency asynchronous data processing. Implements strict OAuth2/JWT authentication, Alembic migrations, and Domain-Driven Design (DDD). Uses FastAPI BackgroundTasks and Pandas to process massive CSV workloads instantly.</p>
                 <div class="tags" style="margin-top: auto;">
                     <span class="tag">OAuth2/JWT</span><span class="tag">Alembic</span><span class="tag">BackgroundTasks</span>
                 </div>
                 <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/FastAPI-Data-Ingestion-Engine-DaaS" target="_blank" class="project-link"><i class="fa-brands fa-github"></i> Check it on GitHub</a>
+                    <a href="https://github.com/Mibrahim25-debug/FastAPI-Data-Ingestion-Engine-DaaS" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
                 </div>
             </div>
 
@@ -564,25 +698,23 @@
     </section>
 
     <section id="experience">
-        <h2 class="section-header white-title">Experience & Client Impact</h2>
-        
+        <h2 class="section-header white-title reveal">Experience &amp; Client Impact</h2>
+
         <div class="grid-2">
-            <!-- Professional Experience -->
             <div>
-                <div class="card" style="margin-bottom: 2rem;">
-                    <h3 class="white-title">Freelance Applied AI Engineer <span style="font-size: 1rem; color: var(--text-main); font-weight: 400;">| Upwork (1 Year+)</span></h3>
+                <div class="card reveal" style="margin-bottom: 1.3rem;">
+                    <h3 class="white-title">Freelance Applied AI Engineer <span style="font-size: 0.85rem; color: var(--text-main); font-weight: 400;">| Upwork (1 Year+)</span></h3>
                     <p>Maintaining a 100% Job Success Score. Designed and delivered LLM agent orchestration systems, automated extraction pipelines, and robust APIs. Replaced manual reporting workflows with deterministic Python logic for global clients.</p>
                 </div>
 
-                <div class="card">
-                    <h3 class="white-title">AI Engineering Intern <span style="font-size: 1rem; color: var(--text-main); font-weight: 400;">| Inovaqo (4 Months)</span></h3>
+                <div class="card reveal">
+                    <h3 class="white-title">AI Engineering Intern <span style="font-size: 0.85rem; color: var(--text-main); font-weight: 400;">| Inovaqo (4 Months)</span></h3>
                     <p>Collaborated with the engineering team to optimize backend infrastructure using advanced Python and FastAPI. Cleaned datasets, wrote SQL queries, and gained hands-on commercial experience deploying scalable applications.</p>
                 </div>
             </div>
 
-            <!-- Client Reviews -->
-            <div style="display: flex; flex-direction: column; gap: 1.5rem;">
-                <div class="testimonial">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+                <div class="testimonial reveal">
                     <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
                     "Ibrahim delivered an exceptional piece of software architecture for our facility. We required a fully offline, examination network with zero internet connectivity due to strict security protocols. He engineered a flawless Python backend... highly recommended."
                     <div class="testimonial-author">
@@ -590,7 +722,7 @@
                     </div>
                 </div>
 
-                <div class="testimonial">
+                <div class="testimonial reveal">
                     <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
                     "Ibrahim built exactly what we needed and delivered it on time. He took the time to understand our requirements before writing any code, which meant the agent worked properly from day one."
                     <div class="testimonial-author">
@@ -598,51 +730,63 @@
                     </div>
                 </div>
 
-                <div class="testimonial">
+                <div class="testimonial reveal">
                     <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
                     "I have a great time working with Muhammad Ibrahim he is quick to the solution, fast, easily accessible... the work is delivered flawlessly."
                     <div class="testimonial-author">
-                        <strong class="white-title">Upwork Client</strong> | Data Crawling & Web Scraping
+                        <strong class="white-title">Upwork Client</strong> | Data Crawling &amp; Web Scraping
                     </div>
                 </div>
-                
-                <div class="testimonial">
+
+                <div class="testimonial reveal">
                     <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
                     "Work was delivered exactly as we needed it. Passionate and eager to learn about the project scope, requirements and domain."
                     <div class="testimonial-author">
-                        <strong class="white-title">Upwork Client</strong> | Senior Backend & AI Engineering
+                        <strong class="white-title">Upwork Client</strong> | Senior Backend &amp; AI Engineering
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- NEW CONTACT SECTION -->
     <section id="contact">
-        <h2 class="section-header white-title">Let's Build Together</h2>
-        <div class="card" style="text-align: center; max-width: 700px; margin: 0 auto; align-items: center;">
-            <h3 class="white-title" style="font-size: 2rem;">Ready to automate your workflows?</h3>
-            <p style="margin-bottom: 2rem; font-size: 1.1rem;">
+        <h2 class="section-header white-title reveal">Let's Build Together</h2>
+        <div class="card reveal" style="text-align: center; max-width: 640px; margin: 0 auto; align-items: center;">
+            <h3 class="white-title" style="font-size: 1.4rem;">Ready to automate your workflows?</h3>
+            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;">
                 I'm currently available for freelance projects and full-time opportunities. Whether you need a production-ready RAG system, an autonomous AI agent, or a complex ETL pipeline, let's talk about how we can build it.
             </p>
-            <div style="display: flex; gap: 1rem; flex-wrap: wrap; justify-content: center;">
-                <!-- Replace with your actual email -->
-                <a href="mailto:your.email@example.com" class="btn"><i class="fa-solid fa-envelope"></i> Send an Email</a>
-                <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" class="btn" style="border-color: #14a800; color: #14a800;"><i class="fa-solid fa-briefcase"></i> Hire me on Upwork</a>
+            <div style="display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: center;">
+                <a href="mailto:ibrahimirfanawan5@gmail.com" class="btn primary"><i class="fa-solid fa-envelope"></i> Send an Email</a>
+                <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener" class="btn" style="border-color: rgba(20,168,0,.45); color: #4ade80;"><i class="fa-solid fa-briefcase"></i> Hire me on Upwork</a>
             </div>
         </div>
     </section>
 
     <footer class="footer">
-        <div class="logo-container" style="display: inline-block; margin-bottom: 2rem;">M. IBRAHIM</div>
-        <div class="social-links" style="justify-content: center; margin-bottom: 2rem;">
-            <a href="https://github.com/Mibrahim25-debug" target="_blank"><i class="fa-brands fa-github"></i></a>
-            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank"><i class="fa-brands fa-linkedin"></i></a>
-            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank"><i class="fa-solid fa-briefcase"></i></a>
+        <div class="logo-container" style="display: inline-block; margin-bottom: 1.5rem;">M. IBRAHIM</div>
+        <div class="social-links" style="justify-content: center; margin-bottom: 1.5rem;">
+            <a href="https://github.com/Mibrahim25-debug" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i></a>
+            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin"></i></a>
+            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener"><i class="fa-solid fa-briefcase"></i></a>
         </div>
-        <p class="white-title">Applied AI & Backend Engineer</p>
-        <p style="font-size: 0.9rem; margin-top: 1rem;">Building systems that run in production, not just in notebooks.</p>
+        <p class="white-title">Applied AI &amp; Backend Engineer</p>
+        <p style="font-size: 0.82rem; margin-top: 0.7rem;">Building systems that run in production, not just in notebooks.</p>
     </footer>
+
+    <script>
+        const nav = document.getElementById('nav');
+        addEventListener('scroll', () => {
+            nav.classList.toggle('scrolled', scrollY > 20);
+        }, { passive: true });
+
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach((e) => {
+                if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+            });
+        }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
+        document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
+    </script>
 
 </body>
 </html>
