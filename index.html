@@ -1,792 +1,1078 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Muhammad Ibrahim Awan | Applied AI Engineer</title>
-    <meta name="description" content="Applied AI Engineer building production LangChain, RAG and agent systems in Python.">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Ibrahim Awan — Applied AI Engineer</title>
+<meta name="description" content="Applied AI Engineer building agents, retrieval systems and Python backends that survive contact with production.">
+<meta name="theme-color" content="#08090A">
 
-        :root {
-            --bg-dark: #06070A;
-            --card-bg: rgba(14, 16, 22, 0.55);
-            --accent: #00e5ff;
-            --accent-soft: rgba(0, 229, 255, 0.14);
-            --accent-border: rgba(0, 229, 255, 0.22);
-            --text-main: #9aa0ab;
-            --text-bright: #d6dae1;
-            --title-white: #ffffff;
-            --hairline: rgba(255, 255, 255, 0.07);
-            --logo-bg: #f8f9fa;
+<meta property="og:type" content="website">
+<meta property="og:title" content="Ibrahim Awan — Applied AI Engineer">
+<meta property="og:description" content="AI systems that survive contact with production — agents, retrieval, and the backends beneath them.">
 
-            /* One shared max width. Without this the page stretches edge to edge
-               on a wide monitor, which is what made everything feel oversized. */
-            --shell: 1240px;
-        }
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Space Grotesk', sans-serif;
-        }
-        html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@studio-freight/lenis@1.0.34/dist/lenis.min.js"></script>
 
-        body {
-            background-color: var(--bg-dark);
-            color: var(--text-main);
-            font-size: 16px;
-            line-height: 1.62;
-            overflow-x: hidden;
-            position: relative;
-        }
+<style>
+/* ==========================================================================
+   00 — TWO-COLOUR SYSTEM (Linear-style)
+   ========================================================================== */
+:root {
+    --bg:        #08090A;
+    --bg-1:      #0E0F11;
+    --bg-2:      #141517;
 
-        /* ============================================================
-           BACKGROUND
-           Floating glow orbs over a 3D perspective grid floor - the look from
-           the live site. The grid is a flat plane rotated back in 3D space,
-           with its background-position scrolling to give the sense of the
-           plane travelling toward the viewer.
-           ============================================================ */
-        .bg-container {
-            position: fixed;
-            inset: 0;
-            z-index: -2;
-            pointer-events: none;
-            overflow: hidden;
-            background-color: var(--bg-dark);
-        }
+    --ac:        #5E6AD2;
+    --ac-hi:     #828FFF;
+    --ac-soft:   rgba(94, 106, 210, 0.11);
+    --ac-line:   rgba(94, 106, 210, 0.32);
 
-        .glow-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(100px);
-            opacity: 0.4;
-            will-change: transform;
-            animation: float 15s infinite alternate ease-in-out;
-        }
-        .orb-1 {
-            width: 50vw; height: 50vw;
-            top: -20%; left: -10%;
-            background: rgba(0, 229, 255, 0.15);
-            animation-delay: 0s;
-        }
-        .orb-2 {
-            width: 40vw; height: 40vw;
-            bottom: -10%; right: -10%;
-            background: rgba(128, 0, 255, 0.12);
-            animation-delay: -5s;
-        }
-        @keyframes float {
-            0%   { transform: translate3d(0, 0, 0); }
-            100% { transform: translate3d(40px, 40px, 0); }
-        }
+    --tx:        #F7F8F8;
+    --tx-2:      #9CA3AF;
+    --tx-3:      #6B7280;
+    --line:      rgba(255, 255, 255, 0.08);
+    --line-2:    rgba(255, 255, 255, 0.14);
 
-        /* 3D perspective grid floor */
-        .grid-floor {
-            position: absolute;
-            bottom: -20%; left: -50%;
-            width: 200%; height: 70%;
-            background-image:
-                linear-gradient(rgba(0, 229, 255, 0.2) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 229, 255, 0.2) 1px, transparent 1px);
-            background-size: 60px 60px;
-            transform: perspective(600px) rotateX(75deg);
-            animation: gridMove 10s linear infinite;
-            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
-            mask-image: linear-gradient(to top, rgba(0,0,0,1) 10%, rgba(0,0,0,0) 80%);
-        }
-        @keyframes gridMove {
-            0%   { background-position: 0 0; }
-            100% { background-position: 0 60px; }
-        }
+    --star:      #FFC53D;
 
-        /* Kept from the refined version: grain breaks up the colour banding
-           that large flat dark areas produce on most panels. Very low opacity,
-           so it reads as texture rather than as an effect. */
-        .bg-grain {
-            position: absolute;
-            inset: -50%;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
-            opacity: 0.028;
-            mix-blend-mode: overlay;
-            will-change: transform;
-            animation: grain 7s steps(5) infinite;
-        }
-        @keyframes grain {
-            0%   { transform: translate3d(0, 0, 0); }
-            25%  { transform: translate3d(-2%, 1.5%, 0); }
-            50%  { transform: translate3d(1.5%, -2%, 0); }
-            75%  { transform: translate3d(-1.5%, -1%, 0); }
-            100% { transform: translate3d(0, 0, 0); }
-        }
+    /* Scaled up the shell width to match the new zoomed-in text size */
+    --shell: 1360px;
+    --nav-h: 70px;
 
-        h1, h2, h3, h4, h5, h6, .white-title {
-            color: var(--title-white);
-            font-weight: 600;
-            letter-spacing: -0.015em;
-        }
+    --ease:   cubic-bezier(.22,.9,.3,1);
+    --ease-o: cubic-bezier(.16,1,.3,1);
+}
 
-        /* ---------------------------------------------------- NAV --- */
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 1.5rem;
-            padding: 0.9rem 2.2rem;
-            position: fixed;
-            width: 100%;
-            top: 0;
-            z-index: 100;
-            background: rgba(6, 7, 10, 0.72);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            border-bottom: 1px solid transparent;
-            transition: border-color 0.3s ease, background 0.3s ease;
-        }
-        nav.scrolled { border-bottom-color: var(--hairline); }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
-        .logo-container {
-            background-color: var(--logo-bg);
-            color: #06070A;
-            padding: 0.4rem 0.9rem;
-            border-radius: 4px;
-            font-weight: 700;
-            font-size: 1rem;
-            letter-spacing: 0.06em;
-            text-decoration: none;
-        }
+html { -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; }
+html.lenis { height:auto; }
+.lenis.lenis-smooth { scroll-behavior:auto !important; }
 
-        nav ul { display: flex; gap: 1.7rem; list-style: none; align-items: center; }
-        nav ul li a {
-            color: var(--text-main);
-            text-decoration: none;
-            font-size: 0.92rem;
-            position: relative;
-            transition: color 0.25s ease;
-        }
-        nav ul li a::after {
-            content: '';
-            position: absolute; left: 0; right: 0; bottom: -5px;
-            height: 1px; background: var(--accent);
-            transform: scaleX(0); transform-origin: right;
-            transition: transform 0.32s ease;
-        }
-        nav ul li a:hover { color: var(--title-white); }
-        nav ul li a:hover::after { transform: scaleX(1); transform-origin: left; }
+body {
+    background:var(--bg);
+    color:var(--tx-2);
+    font-family:'Inter', system-ui, -apple-system, sans-serif;
+    /* Zoomed in base font size to 18px (up from 16px) */
+    font-size:18px;
+    font-weight:400;
+    line-height:1.62;
+    letter-spacing:-0.006em;
+    overflow-x:clip;
+}
 
-        .social-links { display: flex; gap: 1.1rem; }
-        .social-links a {
-            color: var(--text-main);
-            font-size: 1rem;
-            transition: color 0.25s ease, transform 0.25s ease;
-        }
-        .social-links a:hover { color: var(--accent); transform: translateY(-2px); }
+h1,h2,h3,h4 {
+    font-family:'Inter Tight', 'Inter', sans-serif;
+    color:var(--tx);
+    font-weight:600;
+    letter-spacing:-0.03em;
+    line-height:1.1;
+    text-wrap:balance;
+}
+.eyebrow {
+    display:inline-flex; align-items:center; gap:.45rem;
+    font-size:.75rem; font-weight:500; letter-spacing:-0.005em; color:var(--ac-hi);
+}
+.eyebrow::before { content:''; width:5px; height:5px; border-radius:50%; background:var(--ac); box-shadow:0 0 8px rgba(94,106,210,.9); flex:none; }
 
-        /* ---------------------------------------------------- HERO --- */
-        .hero {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            padding: 130px 2.2rem 80px;
-        }
+.lede { font-size:.95rem; line-height:1.62; color:var(--tx-2); max-width:54ch; }
 
-        .hero-inner {
-            width: 100%;
-            max-width: var(--shell);
-            margin: 0 auto;
-            display: grid;
-            grid-template-columns: 1.25fr 0.75fr;
-            gap: 3.5rem;
-            align-items: center;
-        }
+a { color:inherit; }
+img { display:block; max-width:100%; }
+::selection { background:var(--ac); color:#fff; }
+:focus-visible { outline:2px solid var(--ac-hi); outline-offset:3px; border-radius:6px; }
 
-        .hero p.subtitle {
-            color: var(--accent);
-            font-weight: 500;
-            font-size: 0.82rem;
-            letter-spacing: 0.22em;
-            margin-bottom: 1rem;
-            text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-        }
-        .hero p.subtitle::before {
-            content: '';
-            width: 26px; height: 1px;
-            background: var(--accent);
-            flex: none;
-        }
+.skip { position:absolute; top:-100px; left:16px; z-index:9999; background:var(--ac); color:#fff; padding:.65rem 1rem; border-radius:8px; font-weight:500; text-decoration:none; transition:top .3s var(--ease); }
+.skip:focus { top:16px; }
 
-        .hero h1 {
-            font-size: clamp(2.7rem, 5.2vw, 3.9rem);
-            line-height: 1.06;
-            margin-bottom: 0.5rem;
-            font-weight: 700;
-        }
+/* ==========================================================================
+   01 — ATMOSPHERIC BACKGROUND
+   ========================================================================== */
+.amb {
+    position:fixed; inset:0; z-index:-2; overflow:hidden; pointer-events:none;
+    background:radial-gradient(150% 100% at 50% -10%, #13151C 0%, #0B0C10 45%, var(--bg) 80%);
+}
+.amb__l { position:absolute; border-radius:50%; will-change:transform; }
+.amb__l--far { width:82vw; height:60vw; top:-26%; left:6%; background:radial-gradient(closest-side, rgba(94,106,210,.26), transparent 72%); filter:blur(110px); animation:driftFar 34s ease-in-out infinite alternate; }
+.amb__l--mid { width:56vw; height:48vw; top:22%; right:-12%; background:radial-gradient(closest-side, rgba(130,143,255,.17), transparent 70%); filter:blur(90px); animation:driftMid 26s ease-in-out infinite alternate; }
+.amb__l--near { width:44vw; height:38vw; bottom:-14%; left:-8%; background:radial-gradient(closest-side, rgba(94,106,210,.20), transparent 68%); filter:blur(70px); animation:driftNear 21s ease-in-out infinite alternate; }
+@keyframes driftFar  { from{transform:translate3d(0,0,0) scale(1)}      to{transform:translate3d(3%,2%,0) scale(1.06)} }
+@keyframes driftMid  { from{transform:translate3d(0,0,0) scale(1)}      to{transform:translate3d(-5%,-3%,0) scale(1.1)} }
+@keyframes driftNear { from{transform:translate3d(0,0,0) scale(1)}      to{transform:translate3d(8%,-5%,0) scale(1.14)} }
 
-        .hero .role {
-            font-size: clamp(1.15rem, 2.2vw, 1.5rem);
-            font-weight: 400;
-            color: var(--text-bright);
-            margin-bottom: 1.3rem;
-            letter-spacing: 0;
-        }
+.amb__key { position:absolute; top:-24%; left:50%; transform:translateX(-50%); width:86vw; height:62vh; background:radial-gradient(ellipse at center, rgba(255,255,255,.055), transparent 62%); filter:blur(50px); }
+.amb__vig { position:absolute; inset:0; background:radial-gradient(125% 88% at 50% 44%, transparent 52%, rgba(0,0,0,.58) 100%); }
+.amb__grain { position:absolute; inset:0; opacity:.02; mix-blend-mode:overlay; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
-        .hero p.description {
-            font-size: 1.07rem;
-            max-width: 54ch;
-            margin-bottom: 2.2rem;
-            color: var(--text-main);
-        }
+/* ==========================================================================
+   02 — NAV
+   ========================================================================== */
+.nav {
+    position:fixed; top:0; left:0; right:0; z-index:800; height:var(--nav-h);
+    display:flex; align-items:center; justify-content:space-between; gap:1.2rem;
+    padding:0 clamp(1rem,2.4vw,2rem);
+    border-bottom:1px solid transparent;
+    transition:background .4s var(--ease), border-color .4s var(--ease);
+}
+.nav.is-stuck { background:rgba(8,9,10,.8); backdrop-filter:blur(16px) saturate(1.4); -webkit-backdrop-filter:blur(16px) saturate(1.4); border-bottom-color:var(--line); }
+.nav__mark { display:flex; align-items:center; gap:.5rem; font-family:'Inter Tight',sans-serif; font-weight:600; font-size:.9rem; color:var(--tx); text-decoration:none; letter-spacing:-0.02em; white-space:nowrap; }
+.nav__logo { width:24px; height:24px; border-radius:5px; flex:none; background:linear-gradient(140deg,var(--ac-hi),var(--ac)); display:grid; place-items:center; color:#fff; font-size:.7rem; font-weight:700; }
+.nav__links { display:flex; gap:.2rem; list-style:none; align-items:center; }
+.nav__links a { display:block; padding:.35rem .65rem; border-radius:6px; color:var(--tx-2); text-decoration:none; font-size:.85rem; font-weight:450; transition:color .25s var(--ease), background .25s var(--ease); }
+.nav__links a:hover { color:var(--tx); background:rgba(255,255,255,.05); }
+.nav__links a.is-on { color:var(--tx); background:rgba(255,255,255,.06); }
+.nav__cta { display:inline-flex; align-items:center; gap:.35rem; background:var(--ac); color:#fff; text-decoration:none; padding:.45rem .95rem; border-radius:7px; white-space:nowrap; font-size:.85rem; font-weight:500; box-shadow:0 1px 0 rgba(255,255,255,.14) inset, 0 5px 16px rgba(94,106,210,.26); transition:background .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease); }
+.nav__cta:hover { background:#6C78E0; transform:translateY(-1px); box-shadow:0 1px 0 rgba(255,255,255,.18) inset, 0 8px 22px rgba(94,106,210,.4); }
 
-        .hero-actions { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+.burger { display:none; width:40px; height:40px; align-items:center; justify-content:center; flex-direction:column; gap:5px; background:none; border:1px solid var(--line); border-radius:7px; cursor:pointer; }
+.burger i { display:block; width:16px; height:1.5px; background:var(--tx); border-radius:2px; transition:transform .3s var(--ease), opacity .25s; }
+.burger.is-open i:nth-child(1){ transform:translateY(3.25px) rotate(45deg); }
+.burger.is-open i:nth-child(2){ opacity:0; }
+.burger.is-open i:nth-child(3){ transform:translateY(-3.25px) rotate(-45deg); }
 
-        .btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.55rem;
-            padding: 0.78rem 1.4rem;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            color: var(--text-bright);
-            border: 1px solid var(--hairline);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.93rem;
-            border-radius: 7px;
-            transition: all 0.25s ease;
-        }
-        .btn:hover {
-            background: var(--accent-soft);
-            border-color: var(--accent-border);
-            color: var(--title-white);
-            transform: translateY(-2px);
-        }
-        .btn.primary {
-            background: var(--accent);
-            border-color: var(--accent);
-            color: #04121a;
-            font-weight: 600;
-        }
-        .btn.primary:hover {
-            background: #4defff;
-            border-color: #4defff;
-            color: #04121a;
-        }
+.sheet { position:fixed; inset:var(--nav-h) 0 auto 0; z-index:790; background:rgba(10,11,13,.98); backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--line); padding:.5rem clamp(1.2rem,4vw,2.5rem) 1.5rem; display:none; flex-direction:column; opacity:0; transform:translateY(-8px); transition:opacity .3s var(--ease), transform .3s var(--ease); }
+.sheet.is-open { opacity:1; transform:none; }
+.sheet a { color:var(--tx); text-decoration:none; font-size:1.05rem; font-weight:450; padding:.85rem .45rem; border-bottom:1px solid var(--line); }
+.sheet a:last-child { border-bottom:0; }
 
-        /* ------------------------------------------------ PORTRAIT --- */
-        .hero-visual { display: flex; justify-content: center; }
+.progress { position:fixed; top:0; left:0; z-index:850; height:3px; width:100%; transform:scaleX(0); transform-origin:left; background:linear-gradient(90deg,var(--ac),var(--ac-hi)); }
 
-        .portrait {
-            position: relative;
-            width: min(400px, 80vw);
-            aspect-ratio: 1;
-            display: grid;
-            place-items: center;
-        }
+/* ==========================================================================
+   03 — PRIMITIVES
+   ========================================================================== */
+.btn {
+    display:inline-flex; align-items:center; justify-content:center; gap:.45rem;
+    min-height:42px; padding:.65rem 1.15rem;
+    border-radius:8px; text-decoration:none; cursor:pointer;
+    font-family:'Inter',sans-serif; font-size:.875rem; font-weight:500; letter-spacing:-0.008em;
+    border:1px solid var(--line-2); color:var(--tx); background:rgba(255,255,255,.04);
+    transition:background .25s var(--ease), border-color .25s var(--ease), transform .25s var(--ease), box-shadow .25s var(--ease);
+}
+.btn:hover { background:rgba(255,255,255,.08); transform:translateY(-1px); }
+.btn svg { width:16px; height:16px; flex:none; }
+.btn--pri { background:var(--ac); border-color:transparent; color:#fff; box-shadow:0 1px 0 rgba(255,255,255,.16) inset, 0 6px 18px rgba(94,106,210,.28); }
+.btn--pri:hover { background:#6C78E0; box-shadow:0 1px 0 rgba(255,255,255,.2) inset, 0 10px 26px rgba(94,106,210,.4); }
 
-        /* <picture> is an inline wrapper with no size of its own - it derives
-           its width from the image inside it. Sizing the img as a percentage of
-           it is therefore circular, which is what pushed the photo off-centre.
-           display:contents removes the wrapper from layout entirely so the img
-           becomes the grid item and centres against .portrait directly. */
-        .portrait picture { display: contents; }
+.chip { display:inline-flex; align-items:center; font-size:.75rem; font-weight:450; color:var(--tx-2); background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:5px; padding:.3rem .6rem; transition:border-color .25s var(--ease), color .25s var(--ease); }
+.chip:hover { border-color:var(--ac-line); color:var(--tx); }
+.chips { display:flex; flex-wrap:wrap; gap:.35rem; }
 
-        /* Soft light behind the head. Kept tight to the portrait so it reads
-           as a halo rather than a separate glowing shape. */
-        .portrait::before {
-            content: '';
-            position: absolute;
-            inset: 11%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 50% 45%, rgba(0,229,255,0.20), transparent 68%);
-            filter: blur(34px);
-        }
+.sec { max-width:var(--shell); margin:0 auto; padding:clamp(4rem,6vw,6.5rem) clamp(1.2rem,2.6vw,2rem); }
+.sec__head { margin-bottom:clamp(1.8rem,2.8vw,2.5rem); }
+.sec__t { font-size:clamp(1.6rem,2.5vw,2.2rem); margin-top:.7rem; }
+.sec__note { margin-top:.7rem; max-width:50ch; font-size:.95rem; }
 
-        .portrait__img {
-            position: relative;
-            grid-area: 1 / 1;
-            width: 82%;
-            height: 82%;
-            object-fit: cover;
-            object-position: center 42%;
-            border-radius: 50%;
-            z-index: 2;
-            /* The ring lives ON the photo edge, as stacked box-shadows, rather
-               than as a separate element sitting outside it. That gap was what
-               made the old ring read as a floating oval instead of a frame. */
-            box-shadow:
-                0 0 0 1px rgba(255, 255, 255, 0.16),
-                0 0 0 7px rgba(255, 255, 255, 0.035),
-                0 0 0 8px rgba(0, 229, 255, 0.10),
-                0 18px 50px rgba(0, 0, 0, 0.55),
-                0 0 60px rgba(0, 229, 255, 0.13);
-        }
+/* ==========================================================================
+   04 — HERO 
+   ========================================================================== */
+.hero { position:relative; min-height:100svh; display:flex; align-items:center; padding:calc(var(--nav-h) + 4vh) clamp(1.2rem,2.6vw,2rem) 7vh; }
+.hero__in { width:100%; max-width:var(--shell); margin:0 auto; display:grid; grid-template-columns:1fr 1fr; gap:clamp(1.5rem,3.5vw,4rem); align-items:center; }
 
-        @media (max-width: 900px) {
-            .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
-            .hero-visual { order: -1; }
-            .portrait { width: min(300px, 70vw); }
-        }
+.hero__title { font-size:clamp(2rem,3.5vw,3rem); margin:1.1rem 0 1.2rem; line-height:1.12; }
+.hero__title span { color:var(--tx-3); }
+.hero__cta { display:flex; flex-wrap:wrap; gap:.65rem; margin-top:1.8rem; }
 
-        /* ------------------------------------------------ SECTIONS --- */
-        section {
-            padding: 5rem 2.2rem;
-            position: relative;
-            z-index: 10;
-            max-width: var(--shell);
-            margin: 0 auto;
-        }
+.hero__stats { display:flex; flex-wrap:wrap; gap:2.2rem; margin-top:2.2rem; padding-top:1.6rem; border-top:1px solid var(--line); }
+.hero__stats .v { font-family:'Inter Tight',sans-serif; font-size:1.4rem; font-weight:600; color:var(--tx); letter-spacing:-0.03em; line-height:1; }
+.hero__stats .k { margin-top:.4rem; font-size:.8rem; color:var(--tx-3); }
 
-        .section-header {
-            font-size: clamp(1.75rem, 3.4vw, 2.35rem);
-            margin-bottom: 2.2rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.85rem;
-            font-weight: 600;
-        }
-        .section-header::before {
-            content: '';
-            width: 22px; height: 2px;
-            background: var(--accent);
-            flex: none;
-        }
+/* BIG NAME TYPOGRAPHY - Adjusted for zoom */
+.hero__big-name {
+    font-family: 'Inter Tight', sans-serif;
+    font-size: clamp(5rem, 11vw, 11rem);
+    font-weight: 800;
+    line-height: 0.82;
+    letter-spacing: -0.05em;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, var(--tx) 0%, var(--ac-hi) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+    text-align: right;
+    opacity: 0.95;
+    transform-origin: right center;
+}
 
-        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 1.3rem; }
-        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.3rem; }
+.scroll-cue { position:absolute; bottom:3vh; left:50%; transform:translateX(-50%); display:flex; flex-direction:column; align-items:center; gap:.5rem; font-size:.75rem; color:var(--tx-3); }
+.scroll-cue i { display:block; width:1px; height:36px; background:linear-gradient(to bottom,var(--ac),transparent); animation:cue 2s ease-in-out infinite; }
+@keyframes cue { 0%,100%{transform:scaleY(.3);transform-origin:top;opacity:.4} 50%{transform:scaleY(1);transform-origin:top;opacity:1} }
 
-        /* ---------------------------------------------------- CARDS --- */
-        .card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid var(--hairline);
-            padding: 1.75rem;
-            border-radius: 11px;
-            transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-        }
-        .card::after {
-            content: '';
-            position: absolute; inset: 0;
-            border-radius: 10px;
-            background: linear-gradient(140deg, rgba(0,229,255,0.06), transparent 42%);
-            opacity: 0;
-            transition: opacity 0.35s ease;
-            pointer-events: none;
-        }
-        .card:hover { transform: translateY(-4px); border-color: var(--accent-border); }
-        .card:hover::after { opacity: 1; }
+/* ==========================================================================
+   05 — METRICS
+   ========================================================================== */
+.metrics { max-width:var(--shell); margin:0 auto; display:grid; grid-template-columns:repeat(4,1fr); gap:1px; background:var(--line); border-block:1px solid var(--line); }
+.metric { background:var(--bg); padding:1.8rem 1.2rem; text-align:center; transition:background .4s var(--ease); }
+.metric:hover { background:var(--bg-1); }
+.metric__v { font-family:'Inter Tight',sans-serif; font-size:clamp(1.5rem,2.3vw,2rem); font-weight:600; color:var(--tx); letter-spacing:-0.04em; line-height:1; }
+.metric__v em { font-style:normal; color:var(--ac-hi); }
+.metric__k { margin-top:.6rem; font-size:.8rem; color:var(--tx-3); }
 
-        .card-img {
-            width: 100%;
-            height: 180px;
-            background: rgba(0,0,0,0.5);
-            border-radius: 7px;
-            margin-bottom: 1.1rem;
-            border: 1px solid var(--hairline);
-            object-fit: cover;
-            filter: saturate(0.75) contrast(1.05);
-            transition: filter 0.4s ease;
-        }
-        .card:hover .card-img { filter: saturate(1) contrast(1.05); }
+/* ==========================================================================
+   06 — PINNED APPROACH
+   ========================================================================== */
+.approach { position:relative; height:100svh; overflow:hidden; }
+.approach__in { height:100%; max-width:var(--shell); margin:0 auto; padding:0 clamp(1.2rem,2.6vw,2rem); display:grid; grid-template-columns:.38fr .62fr; gap:clamp(2rem,4.5vw,4rem); align-items:center; }
+.approach__num { font-family:'Inter Tight',sans-serif; font-size:clamp(3.2rem,5.5vw,5rem); font-weight:700; line-height:.85; letter-spacing:-0.05em; color:transparent; -webkit-text-stroke:1.5px rgba(255,255,255,.13); }
+.approach__ix { list-style:none; margin-top:1.6rem; display:grid; gap:.65rem; }
+.approach__ix li { display:flex; align-items:center; gap:.8rem; font-size:.875rem; color:var(--tx-3); transition:color .45s var(--ease); }
+.approach__ix li::before { content:''; width:12px; height:1.5px; border-radius:2px; background:currentColor; transition:width .45s var(--ease); flex:none; }
+.approach__ix li.is-on { color:var(--ac-hi); }
+.approach__ix li.is-on::before { width:30px; }
 
-        .card h3 { font-size: 1.18rem; margin-bottom: 0.6rem; line-height: 1.3; }
-        .card p { margin-bottom: 1rem; flex-grow: 1; font-size: 0.95rem; }
+.beats { position:relative; min-height:280px; }
+.beat { position:absolute; inset:0; display:flex; flex-direction:column; justify-content:center; opacity:0; visibility:hidden; }
+.beat.is-on { opacity:1; visibility:visible; }
+.beat__t { font-size:clamp(1.5rem,2.5vw,2.15rem); margin-bottom:.9rem; }
+.beat__out { margin-top:1.2rem; padding:.8rem 1rem; border:1px solid var(--ac-line); background:var(--ac-soft); border-radius:9px; color:var(--tx); font-size:.9rem; max-width:48ch; }
+.beat__out b { color:var(--ac-hi); font-weight:600; }
 
-        /* ---------------------------------------------- TECH STACK --- */
-        .tech-category { margin-bottom: 1.6rem; }
-        .tech-category h4 {
-            color: var(--accent);
-            margin-bottom: 0.75rem;
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
-            font-weight: 600;
-        }
-        .tags { display: flex; flex-wrap: wrap; gap: 0.45rem; }
-        .tag {
-            background: rgba(255, 255, 255, 0.035);
-            color: var(--text-bright);
-            font-size: 0.84rem;
-            padding: 0.42rem 0.8rem;
-            border-radius: 5px;
-            border: 1px solid var(--hairline);
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            transition: all 0.25s ease;
-        }
-        .tag i { color: var(--accent); font-size: 0.8em; }
-        .tag:hover {
-            border-color: var(--accent-border);
-            background: var(--accent-soft);
-            transform: translateY(-2px);
-        }
+/* ==========================================================================
+   07 — WORK: sticky stack
+   ========================================================================== */
+.work { max-width:var(--shell); margin:0 auto; padding:clamp(4rem,6vw,6.5rem) clamp(1.2rem,2.6vw,2rem); }
+.proj-list { display:flex; flex-direction:column; gap:2rem; }
 
-        /* -------------------------------------------------- LINKS --- */
-        .project-actions { display: flex; gap: 1.2rem; margin-top: 1.1rem; }
-        .project-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.45rem;
-            color: var(--text-main);
-            text-decoration: none;
-            font-weight: 500;
-            font-size: 0.9rem;
-            transition: color 0.25s ease;
-        }
-        .project-link:hover { color: var(--accent); }
+.proj {
+    position:sticky; top:calc(var(--nav-h) + 1.2rem);
+    background:var(--bg-1); border:1px solid var(--line);
+    border-radius:16px; overflow:hidden;
+    box-shadow:0 25px 60px rgba(0,0,0,.6);
+    will-change:transform;
+}
+.proj__grid { display:grid; grid-template-columns:1fr 1fr; }
 
-        /* -------------------------------------------- TESTIMONIALS --- */
-        .testimonial {
-            background: rgba(255,255,255,0.022);
-            backdrop-filter: blur(10px);
-            padding: 1.3rem 1.4rem;
-            font-style: italic;
-            font-size: 0.95rem;
-            border-radius: 0 9px 9px 0;
-            border: 1px solid var(--hairline);
-            border-left: 3px solid var(--accent);
-            transition: border-color 0.3s ease, background 0.3s ease;
-        }
-        .testimonial:hover { background: rgba(255,255,255,0.04); }
-        .testimonial .stars { color: #ffd45e; margin-bottom: 0.7rem; font-style: normal; font-size: 0.78rem; letter-spacing: 0.1em; }
-        .testimonial-author { margin-top: 1rem; font-style: normal; font-size: 0.84rem; }
+.proj__media { position:relative; overflow:hidden; background:var(--bg-2); }
+.proj__media img { width:100%; height:100%; object-fit:cover; transition:transform .9s var(--ease-o); }
+.proj:hover .proj__media img { transform:scale(1.035); }
+.proj__media::after { content:''; position:absolute; inset:0; background:linear-gradient(100deg, transparent 58%, var(--bg-1) 99%); }
+.proj__no { position:absolute; top:.85rem; left:.95rem; z-index:2; font-family:'Inter Tight',sans-serif; font-size:.75rem; font-weight:600; color:var(--tx); background:rgba(8,9,10,.72); backdrop-filter:blur(10px); border:1px solid var(--line-2); border-radius:6px; padding:.25rem .6rem; }
 
-        /* ------------------------------------------------- FOOTER --- */
-        .footer {
-            text-align: center;
-            padding: 2.6rem 2.2rem;
-            border-top: 1px solid var(--hairline);
-            margin-top: 2.5rem;
-            position: relative;
-            z-index: 10;
-        }
-        .footer p { font-size: 0.86rem; }
+.proj__body { padding:clamp(1.3rem,2vw,1.8rem); display:flex; flex-direction:column; justify-content:center; }
+.proj__t { font-size:clamp(1.15rem,1.7vw,1.45rem); margin:.6rem 0 .8rem; }
 
-        /* ------------------------------------------------ REVEAL --- */
-        .reveal {
-            opacity: 0;
-            transform: translateY(16px);
-            transition: opacity 0.7s cubic-bezier(.2,.9,.3,1), transform 0.7s cubic-bezier(.2,.9,.3,1);
-        }
-        .reveal.in { opacity: 1; transform: none; }
+.proj__out { display:flex; gap:.6rem; align-items:flex-start; background:var(--ac-soft); border:1px solid var(--ac-line); border-radius:9px; padding:.75rem .9rem; margin-bottom:.85rem; font-size:.875rem; color:var(--tx); line-height:1.5; }
+.proj__out svg { width:14px; height:14px; flex:none; margin-top:.2rem; color:var(--ac-hi); }
+.proj__out b { color:var(--ac-hi); font-weight:600; }
 
-        :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+.proj__p { font-size:.875rem; line-height:1.6; margin-bottom:.95rem; }
 
-        @media (max-width: 860px) {
-            nav ul { display: none; }
-            nav { padding: 0.8rem 1.2rem; }
-            section { padding: 3.2rem 1.2rem; }
-            .hero { padding: 110px 1.2rem 60px; }
-        }
+.proj__skills { margin-bottom:1.2rem; }
+.proj__skills .k { display:block; font-size:.72rem; color:var(--tx-3); margin-bottom:.5rem; font-weight:500; letter-spacing:.02em; text-transform:uppercase; }
+.proj__link { align-self:flex-start; }
 
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
-                transition-duration: 0.01ms !important;
-            }
-            .reveal { opacity: 1; transform: none; }
-            /* Hold the orbs at a settled offset rather than wherever frame one
-               happened to land, and stop the floor and grain moving. */
-            .orb-1 { transform: translate3d(20px, 20px, 0); }
-            .orb-2 { transform: translate3d(-14px, 14px, 0); }
-            .grid-floor, .bg-grain { animation: none; }
-        }
-    </style>
+/* ==========================================================================
+   08 — CAPABILITIES
+   ========================================================================== */
+.caps { display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line); border-radius:12px; overflow:hidden; }
+.cap { background:var(--bg); padding:1.6rem 1.45rem; transition:background .4s var(--ease); }
+.cap:hover { background:var(--bg-1); }
+.cap__n { font-size:.75rem; color:var(--ac-hi); font-weight:500; }
+.cap__h { font-size:1.1rem; margin:.6rem 0 .95rem; }
+
+/* ==========================================================================
+   09 — LEDGER + REVIEWS
+   ========================================================================== */
+.ledger { border-top:1px solid var(--line); }
+.row { display:grid; grid-template-columns:.22fr .4fr .38fr; gap:1.6rem; align-items:baseline; padding:1.6rem 0; border-bottom:1px solid var(--line); transition:padding-left .4s var(--ease); }
+.row:hover { padding-left:.85rem; }
+.row__k { font-size:.85rem; color:var(--ac-hi); font-weight:500; }
+.row__t { font-size:1.15rem; }
+.row__w { margin-top:.25rem; font-size:.85rem; color:var(--tx-3); }
+.row__p { font-size:.9rem; }
+
+.words { display:grid; grid-template-columns:repeat(2,1fr); gap:1rem; }
+.word { background:var(--bg-1); border:1px solid var(--line); border-radius:12px; padding:1.5rem 1.6rem; display:flex; flex-direction:column; transition:border-color .4s var(--ease), transform .4s var(--ease-o); }
+.word:hover { border-color:var(--ac-line); transform:translateY(-3px); }
+.stars { display:flex; gap:2px; margin-bottom:.9rem; }
+.stars svg { width:15px; height:15px; color:var(--star); }
+.word__q { font-size:.9rem; line-height:1.62; color:var(--tx); margin-bottom:1.2rem; flex-grow:1; }
+.word__b { display:flex; align-items:center; gap:.75rem; padding-top:.9rem; border-top:1px solid var(--line); }
+.word__av { width:34px; height:34px; border-radius:50%; flex:none; display:grid; place-items:center; background:linear-gradient(140deg,var(--ac-hi),var(--ac)); color:#fff; font-size:.75rem; font-weight:600; font-family:'Inter Tight',sans-serif; }
+.word__b strong { display:block; color:var(--tx); font-size:.875rem; font-weight:500; }
+.word__b span { font-size:.78rem; color:var(--tx-3); }
+
+/* ==========================================================================
+   10 — CONTACT + FOOTER
+   ========================================================================== */
+.close { max-width:var(--shell); margin:0 auto; padding:clamp(4rem,6vw,6.5rem) clamp(1.2rem,2.6vw,2rem) clamp(2.5rem,5vw,4rem); }
+.close__card { position:relative; overflow:hidden; text-align:center; background:var(--bg-1); border:1px solid var(--line); border-radius:16px; padding:clamp(2rem,5vw,3.5rem) clamp(1.4rem,4vw,2.5rem); }
+.close__card::before { content:''; position:absolute; inset:-50% -20% auto -20%; height:150%; background:radial-gradient(closest-side, rgba(94,106,210,.20), transparent 70%); pointer-events:none; }
+.close__card > * { position:relative; }
+.close__t { font-size:clamp(1.6rem,3vw,2.4rem); margin:.8rem 0 .8rem; }
+.close__p { max-width:44ch; margin:0 auto 1.6rem; font-size:.95rem; }
+.close__btns { display:flex; flex-wrap:wrap; gap:.75rem; justify-content:center; }
+.close__btns .btn { min-height:46px; padding:.75rem 1.4rem; }
+
+.foot { max-width:var(--shell); margin:0 auto; padding:1.8rem clamp(1.2rem,2.6vw,2rem) 3rem; border-top:1px solid var(--line); display:flex; justify-content:space-between; gap:1.2rem; flex-wrap:wrap; font-size:.85rem; color:var(--tx-3); }
+.foot__links { display:flex; gap:1.4rem; }
+.foot__links a { text-decoration:none; transition:color .25s var(--ease); }
+.foot__links a:hover { color:var(--tx); }
+
+.rise { opacity:0; transform:translateY(18px); }
+.rise.is-in { opacity:1; transform:none; transition:opacity .8s var(--ease-o), transform .8s var(--ease-o); }
+
+/* ==========================================================================
+   11 — RESPONSIVE
+   ========================================================================== */
+@media (max-height:800px) and (min-width:981px){
+    .proj__body { padding:1.2rem 1.35rem; }
+    .proj__p { font-size:.85rem; line-height:1.55; margin-bottom:.8rem; }
+    .proj__out { font-size:.85rem; padding:.65rem .8rem; margin-bottom:.7rem; }
+    .proj__t { font-size:1.2rem; margin:.5rem 0 .7rem; }
+    .proj__skills { margin-bottom:.9rem; }
+    .beats { min-height:240px; }
+    .hero__stats { margin-top:1.8rem; padding-top:1.3rem; }
+}
+
+@media (max-width:980px){
+    .hero__in { grid-template-columns:1fr; gap:2.5rem; }
+    .hero__big-name { order:-1; text-align:left; transform-origin:left center; font-size: clamp(5rem, 16vw, 8rem); }
+    .approach__in { grid-template-columns:1fr; gap:1.5rem; align-content:center; }
+    .approach__ix { display:flex; flex-wrap:wrap; gap:1.1rem; margin-top:1.1rem; }
+    .proj__grid { grid-template-columns:1fr; }
+    .proj__media { height:210px; }
+    .proj__media::after { background:linear-gradient(to bottom, transparent 50%, var(--bg-1) 99%); }
+    .caps { grid-template-columns:1fr; }
+    .metrics { grid-template-columns:repeat(2,1fr); }
+    .words { grid-template-columns:1fr; }
+    .row { grid-template-columns:1fr; gap:.5rem; }
+}
+
+@media (max-width:820px){
+    .nav__links, .nav__cta { display:none; }
+    .burger { display:flex; }
+    .sheet { display:flex; }
+    .proj { position:static; }
+    .proj-list { gap:1.5rem; }
+}
+
+@media (max-width:520px){
+    .hero__stats { gap:1.4rem; }
+    .close__btns .btn { flex:1 1 100%; }
+}
+
+/* ==========================================================================
+   12 — REDUCED MOTION
+   ========================================================================== */
+@media (prefers-reduced-motion:reduce){
+    *,*::before,*::after { animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important; }
+    .rise { opacity:1; transform:none; }
+    .approach { height:auto; padding:4rem 0; }
+    .approach__in { height:auto; }
+    .beats { min-height:0; display:flex; flex-direction:column; gap:2.2rem; }
+    .beat { position:static; opacity:1; visibility:visible; }
+    .proj { position:static; transform:none !important; filter:none !important; }
+    .amb__grain { display:none; }
+}
+</style>
 </head>
 <body>
 
-    <div class="bg-container">
-        <div class="glow-orb orb-1"></div>
-        <div class="glow-orb orb-2"></div>
-        <div class="grid-floor"></div>
-        <div class="bg-grain"></div>
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="amb" aria-hidden="true">
+    <div class="amb__key"></div>
+    <div class="amb__l amb__l--far"></div>
+    <div class="amb__l amb__l--mid"></div>
+    <div class="amb__l amb__l--near"></div>
+    <div class="amb__vig"></div>
+    <div class="amb__grain"></div>
+</div>
+
+<div class="progress" id="progress" aria-hidden="true"></div>
+
+<!-- ============================== NAV ============================== -->
+<nav class="nav" id="nav" aria-label="Primary">
+    <a href="#top" class="nav__mark"><span class="nav__logo">IA</span> Ibrahim Awan</a>
+    <ul class="nav__links">
+        <li><a href="#approach">Approach</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#capabilities">Capabilities</a></li>
+        <li><a href="#experience">Experience</a></li>
+    </ul>
+    <a href="#contact" class="nav__cta">Contact me</a>
+    <button class="burger" id="burger" aria-label="Open menu" aria-expanded="false" aria-controls="sheet">
+        <i></i><i></i><i></i>
+    </button>
+</nav>
+
+<div class="sheet" id="sheet" hidden>
+    <a href="#approach">Approach</a>
+    <a href="#work">Work</a>
+    <a href="#capabilities">Capabilities</a>
+    <a href="#experience">Experience</a>
+    <a href="#contact">Contact</a>
+</div>
+
+<main id="main">
+
+<!-- ============================== HERO ============================== -->
+<header class="hero" id="top">
+    <div class="hero__in">
+        <div>
+            <p class="eyebrow">Applied AI Engineer · Available for work</p>
+
+            <h1 class="hero__title">
+                AI systems that survive<br>
+                <span>contact with production.</span>
+            </h1>
+
+            <p class="lede">
+                I build agents that decide, retrieval your team can trust, and the Python
+                backends holding it all upright — delivered as working software, not a
+                proof of concept.
+            </p>
+
+            <div class="hero__cta">
+                <a href="#work" class="btn btn--pri">
+                    See the work
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+                </a>
+                <a href="#contact" class="btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+                    Contact me
+                </a>
+            </div>
+
+            <div class="hero__stats">
+                <div><div class="v">100%</div><div class="k">Job success score</div></div>
+                <div><div class="v">7</div><div class="k">Systems in production</div></div>
+                <div><div class="v">1yr+</div><div class="k">Delivering for clients</div></div>
+            </div>
+        </div>
+
+        <div class="hero__big-name">
+            Ibrahim<br>Awan
+        </div>
     </div>
 
-    <nav id="nav">
-        <a href="#" class="logo-container">M. IBRAHIM</a>
-        <ul>
-            <li><a href="#about">About</a></li>
-            <li><a href="#skills">Tech Stack</a></li>
-            <li><a href="#projects">Engineering</a></li>
-            <li><a href="#experience">Experience</a></li>
-            <li><a href="#contact" style="color: var(--accent); font-weight: 600;">Contact</a></li>
-        </ul>
-        <div class="social-links">
-            <a href="https://github.com/Mibrahim25-debug" target="_blank" rel="noopener" title="GitHub"><i class="fa-brands fa-github"></i></a>
-            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" rel="noopener" title="LinkedIn"><i class="fa-brands fa-linkedin"></i></a>
-            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener" title="Upwork"><i class="fa-solid fa-briefcase"></i></a>
+    <div class="scroll-cue" aria-hidden="true">Scroll<i></i></div>
+</header>
+
+<!-- ============================ APPROACH ============================ -->
+<section class="approach" id="approach">
+    <div class="approach__in">
+        <aside>
+            <div class="approach__num" id="beatNum">01</div>
+            <p class="eyebrow" style="margin-top:1rem">How the work is built</p>
+            <ul class="approach__ix" id="beatIndex">
+                <li class="is-on">Agents that decide</li>
+                <li>Retrieval you can trust</li>
+                <li>Backends that hold</li>
+            </ul>
+        </aside>
+
+        <div class="beats" id="beats">
+            <article class="beat is-on">
+                <h2 class="beat__t">Agents that actually decide something.</h2>
+                <p class="lede">LangChain, LangGraph and hand-written ReAct loops with real tool routing — SQL toolkits, live web gateways, deterministic calculators. The agent picks the path; the system keeps it honest.</p>
+                <p class="beat__out"><b>Outcome —</b> work that consumed hours of manual effort now runs unattended.</p>
+            </article>
+
+            <article class="beat">
+                <h2 class="beat__t">Retrieval your team can trust.</h2>
+                <p class="lede">RAG pipelines tuned against real corpora, not toy datasets. Vector stores, semantic search and chunking strategies chosen for the documents you actually have.</p>
+                <p class="beat__out"><b>Outcome —</b> answers grounded in your data, with the receipts to prove it.</p>
+            </article>
+
+            <article class="beat">
+                <h2 class="beat__t">The backend underneath it all.</h2>
+                <p class="lede">FastAPI services, PostgreSQL, ETL pipelines, OAuth2 and JWT, Docker, background workers. The unglamorous layer that decides whether any of it ships.</p>
+                <p class="beat__out"><b>Outcome —</b> a system that survives real traffic, not just a demo.</p>
+            </article>
         </div>
-    </nav>
+    </div>
+</section>
 
-    <header class="hero" id="about">
-        <div class="hero-inner">
+<!-- ============================ METRICS ============================ -->
+<div class="metrics">
+    <div class="metric rise"><div class="metric__v">100<em>%</em></div><div class="metric__k">Upwork job success</div></div>
+    <div class="metric rise"><div class="metric__v">7<em>+</em></div><div class="metric__k">Production systems</div></div>
+    <div class="metric rise"><div class="metric__v">24<em>/</em>7</div><div class="metric__k">Agent uptime once shipped</div></div>
+    <div class="metric rise"><div class="metric__v">0</div><div class="metric__k">Manual reports left standing</div></div>
+</div>
 
-            <div class="hero-text">
-                <p class="subtitle">Building Production-Ready AI Systems</p>
-                <h1>Muhammad Ibrahim Awan</h1>
-                <p class="role">Applied AI Engineer</p>
-                <p class="description">
-                    I mainly work with AI agents, LangChain, RAG, and Python backends. I don't just connect an AI model and call it done. I build the rest of the system around it too, including the retrieval, API, and database, so everything works together properly. My focus is on building AI systems that are actually reliable and usable in real projects.
-                </p>
-                <div class="hero-actions">
-                    <a href="#projects" class="btn primary"><i class="fa-solid fa-code"></i> View Projects</a>
-                    <a href="https://github.com/Mibrahim25-debug" target="_blank" rel="noopener" class="btn"><i class="fa-brands fa-github"></i> GitHub</a>
-                    <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" rel="noopener" class="btn"><i class="fa-brands fa-linkedin"></i> LinkedIn</a>
-                    <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener" class="btn"><i class="fa-solid fa-briefcase"></i> Upwork</a>
+<!-- ============================== WORK ============================== -->
+<section class="work" id="work">
+    <div class="sec__head rise">
+        <p class="eyebrow">Selected work</p>
+        <h2 class="sec__t">Seven systems, all of them shipped.</h2>
+        <p class="sec__note">Each one holds the screen as you scroll — the outcome it delivered, how it was built, the stack behind it, and the repository.</p>
+    </div>
+
+    <div class="proj-list" id="projList">
+
+        <!-- 01 -->
+        <article class="proj">
+            <div class="proj__grid">
+                <div class="proj__media">
+                    <div class="proj__no">01 / 07</div>
+                    <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1400" alt="" loading="lazy">
+                </div>
+                <div class="proj__body">
+                    <p class="eyebrow">PropTech · Autonomous agent</p>
+                    <h3 class="proj__t">Veridian — Autonomous Real Estate Intelligence</h3>
+                    <div class="proj__out">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                        <span><b>Outcome —</b> hours of manual property research replaced by an agent that queries, calculates and reports on demand, so analysts review conclusions instead of assembling spreadsheets.</span>
+                    </div>
+                    <p class="proj__p">An enterprise PropTech pipeline paired with a tool-using AI analyst. It harvests unstructured global property listings through headless Playwright automation, normalises them in a Pandas warehouse and persists via SQLAlchemy. On top sits a zero-framework ReAct loop bound to Groq's Llama 3.3 70B, routing execution between SQL toolkits, live web gateways and deterministic financial calculators.</p>
+                    <div class="proj__skills">
+                        <span class="k">Built with</span>
+                        <div class="chips">
+                            <span class="chip">Python</span><span class="chip">FastAPI</span><span class="chip">Playwright</span>
+                            <span class="chip">Llama 3.3 70B</span><span class="chip">Groq</span><span class="chip">Pandas</span><span class="chip">SQLAlchemy</span>
+                        </div>
+                    </div>
+                    <a class="btn proj__link" href="https://github.com/Mibrahim25-debug/Veridian-REAL-ESTATE-INTELLIGENT" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
+                        View repository
+                    </a>
                 </div>
             </div>
+        </article>
 
-            <div class="hero-visual">
-                <div class="portrait">
-                    <picture>
-                        <source srcset="profile.webp" type="image/webp">
-                        <img src="profile.jpg" alt="Muhammad Ibrahim Awan" class="portrait__img" width="720" height="720">
-                    </picture>
+        <!-- 02 -->
+        <article class="proj">
+            <div class="proj__grid">
+                <div class="proj__media">
+                    <div class="proj__no">02 / 07</div>
+                    <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1400" alt="" loading="lazy">
+                </div>
+                <div class="proj__body">
+                    <p class="eyebrow">E-commerce · Multi-tool agent</p>
+                    <h3 class="proj__t">Aisle — Retail Intelligence Agent</h3>
+                    <div class="proj__out">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                        <span><b>Outcome —</b> pricing and demand decisions moved off gut-feel spreadsheets onto a live, queryable agent, giving the team answers in seconds instead of an analyst's afternoon.</span>
+                    </div>
+                    <p class="proj__p">An autonomous AI analyst for e-commerce. Aisle ingests store data into a consolidated warehouse, then places a multi-tool agent on top of it. A native tool-calling loop on Groq/Llama 3 wields twelve distinct tools to forecast demand, recommend pricing and segment customers through RFM analysis, streaming responses token by token into a premium Next.js dashboard.</p>
+                    <div class="proj__skills">
+                        <span class="k">Built with</span>
+                        <div class="chips">
+                            <span class="chip">Python</span><span class="chip">LangChain</span><span class="chip">Groq</span>
+                            <span class="chip">Llama 3</span><span class="chip">Next.js</span><span class="chip">APScheduler</span><span class="chip">RFM</span>
+                        </div>
+                    </div>
+                    <a class="btn proj__link" href="https://github.com/Mibrahim25-debug/AISLE---RETAIL-AGENT" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
+                        View repository
+                    </a>
                 </div>
             </div>
+        </article>
 
+        <!-- 03 -->
+        <article class="proj">
+            <div class="proj__grid">
+                <div class="proj__media">
+                    <div class="proj__no">03 / 07</div>
+                    <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1400" alt="" loading="lazy">
+                </div>
+                <div class="proj__body">
+                    <p class="eyebrow">Security · Autonomous extraction</p>
+                    <h3 class="proj__t">AI Web Scraping Agent, SSRF-Hardened</h3>
+                    <div class="proj__out">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                        <span><b>Outcome —</b> plain-English requests turn into validated JSON safely, removing the need to write and maintain a bespoke scraper for every new site.</span>
+                    </div>
+                    <p class="proj__p">An autonomous agent that takes instructions in natural language and extracts structured, schema-validated data from any website. A two-stage fetch keeps token costs down by deciding what actually needs a full render, extraction schemas are generated at runtime, and every resolved IP is validated against loopback, private and cloud-metadata ranges before a request is made.</p>
+                    <div class="proj__skills">
+                        <span class="k">Built with</span>
+                        <div class="chips">
+                            <span class="chip">Python</span><span class="chip">LangGraph</span><span class="chip">Pydantic</span>
+                            <span class="chip">SSRF Hardening</span><span class="chip">Dynamic Schemas</span>
+                        </div>
+                    </div>
+                    <a class="btn proj__link" href="https://github.com/Mibrahim25-debug/WEB-SCRAPING-AGENT" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
+                        View repository
+                    </a>
+                </div>
+            </div>
+        </article>
+
+        <!-- 04 -->
+        <article class="proj">
+            <div class="proj__grid">
+                <div class="proj__media">
+                    <div class="proj__no">04 / 07</div>
+                    <img src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?auto=format&fit=crop&q=80&w=1400" alt="" loading="lazy">
+                </div>
+                <div class="proj__body">
+                    <p class="eyebrow">Aerospace · Air-gapped systems</p>
+                    <h3 class="proj__t">NASTP Air-Gapped Examination Network</h3>
+                    <div class="proj__out">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                        <span><b>Outcome —</b> a high-security aerospace facility runs digital examinations with zero internet dependency and zero external exposure, meeting protocols that ruled out every cloud option.</span>
+                    </div>
+                    <p class="proj__p">An enterprise-grade, fully offline client–server architecture. It bypasses the cloud entirely by establishing an asynchronous HTTP polling network across a local subnet, coordinating exam delivery and collection between machines that never touch the internet. A Pandas ETL engine ingests messy CSV question banks and normalises them into a clean SQLite store behind a PySide6 desktop interface.</p>
+                    <div class="proj__skills">
+                        <span class="k">Built with</span>
+                        <div class="chips">
+                            <span class="chip">Python</span><span class="chip">Sockets</span><span class="chip">PySide6</span>
+                            <span class="chip">SQLite</span><span class="chip">Pandas ETL</span><span class="chip">Async Polling</span>
+                        </div>
+                    </div>
+                    <a class="btn proj__link" href="https://github.com/Mibrahim25-debug/Secure-Exam-Software-FOR-NASTP" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
+                        View repository
+                    </a>
+                </div>
+            </div>
+        </article>
+
+        <!-- 05 -->
+        <article class="proj">
+            <div class="proj__grid">
+                <div class="proj__media">
+                    <div class="proj__no">05 / 07</div>
+                    <img src="https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&q=80&w=1400" alt="" loading="lazy">
+                </div>
+                <div class="proj__body">
+                    <p class="eyebrow">Data engineering · Automation</p>
+                    <h3 class="proj__t">Automated Competitor Price Tracker</h3>
+                    <div class="proj__out">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                        <span><b>Outcome —</b> competitor pricing checks that were manual and occasional became continuous and automatic, turning a recurring chore into a live analytics feed.</span>
+                    </div>
+                    <p class="proj__p">An end-to-end data engineering pipeline. It extracts e-commerce pricing data via Python Requests, normalises it and enforces strict typing through Pandas so malformed rows never reach storage, then loads everything into a relational SQLite database through SQLAlchemy. Secure FastAPI endpoints serve the result to a Chart.js dashboard for real-time comparison.</p>
+                    <div class="proj__skills">
+                        <span class="k">Built with</span>
+                        <div class="chips">
+                            <span class="chip">Python</span><span class="chip">FastAPI</span><span class="chip">Pandas</span>
+                            <span class="chip">SQLAlchemy</span><span class="chip">SQLite</span><span class="chip">Chart.js</span>
+                        </div>
+                    </div>
+                    <a class="btn proj__link" href="https://github.com/Mibrahim25-debug/Competitor-Price-Tracker/tree/main" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
+                        View repository
+                    </a>
+                </div>
+            </div>
+        </article>
+
+        <!-- 06 -->
+        <article class="proj">
+            <div class="proj__grid">
+                <div class="proj__media">
+                    <div class="proj__no">06 / 07</div>
+                    <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1400" alt="" loading="lazy">
+                </div>
+                <div class="proj__body">
+                    <p class="eyebrow">Data engineering · Warehousing</p>
+                    <h3 class="proj__t">MarketSync — Multi-Source ETL Pipeline</h3>
+                    <div class="proj__out">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                        <span><b>Outcome —</b> three disconnected and inconsistent data sources became one clean warehouse behind a single dashboard, ending the manual reconciliation between them.</span>
+                    </div>
+                    <p class="proj__p">Extracts live job market data from isolated sources that share no common format — REST APIs, BeautifulSoup web scrapers and static CSV exports — then cleans and reconciles it under strict Pandas logic. Everything is unified into a single PostgreSQL data warehouse and served through FastAPI to a responsive Tailwind analytics dashboard.</p>
+                    <div class="proj__skills">
+                        <span class="k">Built with</span>
+                        <div class="chips">
+                            <span class="chip">Python</span><span class="chip">BeautifulSoup</span><span class="chip">Pandas</span>
+                            <span class="chip">PostgreSQL</span><span class="chip">FastAPI</span><span class="chip">Tailwind</span>
+                        </div>
+                    </div>
+                    <a class="btn proj__link" href="https://github.com/Mibrahim25-debug/Multi-Source-Data-Extraction-Pipeline-Jobs-Market-Analytics" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
+                        View repository
+                    </a>
+                </div>
+            </div>
+        </article>
+
+        <!-- 07 -->
+        <article class="proj">
+            <div class="proj__grid">
+                <div class="proj__media">
+                    <div class="proj__no">07 / 07</div>
+                    <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=1400" alt="" loading="lazy">
+                </div>
+                <div class="proj__body">
+                    <p class="eyebrow">Backend · Data-as-a-Service</p>
+                    <h3 class="proj__t">FastAPI Data Ingestion Engine (DaaS)</h3>
+                    <div class="proj__out">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+                        <span><b>Outcome —</b> massive CSV workloads process in the background instead of blocking the product, so users get an instant response while heavy work finishes behind them.</span>
+                    </div>
+                    <p class="proj__p">An enterprise FastAPI backend for secure, high-concurrency asynchronous data processing. It implements strict OAuth2 and JWT authentication, Alembic migrations and a domain-driven design structure that keeps the codebase navigable as it grows. BackgroundTasks paired with Pandas absorb large CSV workloads without ever tying up a request thread.</p>
+                    <div class="proj__skills">
+                        <span class="k">Built with</span>
+                        <div class="chips">
+                            <span class="chip">Python</span><span class="chip">FastAPI</span><span class="chip">OAuth2 / JWT</span>
+                            <span class="chip">Alembic</span><span class="chip">Pandas</span><span class="chip">BackgroundTasks</span><span class="chip">DDD</span>
+                        </div>
+                    </div>
+                    <a class="btn proj__link" href="https://github.com/Mibrahim25-debug/FastAPI-Data-Ingestion-Engine-DaaS" target="_blank" rel="noopener">
+                        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.2 1.7 1.2 1 1.8 2.7 1.3 3.4 1 .1-.7.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.8 0-1.3.5-2.3 1.2-3.2-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.9 1.2 1.9 1.2 3.2 0 4.5-2.7 5.5-5.3 5.8.4.4.8 1.1.8 2.2v3.3c0 .4.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.9C23.5 5.7 18.3.5 12 .5Z"/></svg>
+                        View repository
+                    </a>
+                </div>
+            </div>
+        </article>
+
+    </div>
+</section>
+
+<!-- ========================== CAPABILITIES ========================== -->
+<section class="sec" id="capabilities">
+    <div class="sec__head rise">
+        <p class="eyebrow">Capabilities</p>
+        <h2 class="sec__t">The stack behind the outcomes.</h2>
+        <p class="sec__note">Grouped by the layer of the system each tool actually lives in.</p>
+    </div>
+
+    <div class="caps rise">
+        <div class="cap">
+            <p class="cap__n">Layer 01</p>
+            <h3 class="cap__h">Intelligence</h3>
+            <div class="chips">
+                <span class="chip">LangChain</span><span class="chip">LangGraph</span><span class="chip">AI Agents</span>
+                <span class="chip">RAG Pipelines</span><span class="chip">Semantic Search</span><span class="chip">Chroma</span>
+                <span class="chip">Pinecone</span><span class="chip">Llama 3 / Groq</span><span class="chip">OpenAI / Azure</span><span class="chip">Hugging Face</span>
+            </div>
         </div>
-    </header>
-
-    <section id="skills">
-        <h2 class="section-header white-title reveal">Comprehensive Tech Stack</h2>
-
-        <div class="tech-category reveal">
-            <h4>Languages &amp; Core</h4>
-            <div class="tags">
-                <span class="tag"><i class="fa-brands fa-python"></i> Python</span>
-                <span class="tag"><i class="fa-solid fa-database"></i> SQL</span>
-                <span class="tag"><i class="fa-solid fa-code"></i> VS Code</span>
+        <div class="cap">
+            <p class="cap__n">Layer 02</p>
+            <h3 class="cap__h">Services &amp; Data</h3>
+            <div class="chips">
+                <span class="chip">Python</span><span class="chip">FastAPI</span><span class="chip">PostgreSQL</span>
+                <span class="chip">Redis</span><span class="chip">SQLAlchemy</span><span class="chip">SQLite</span>
+                <span class="chip">Pandas</span><span class="chip">ETL</span><span class="chip">REST APIs</span><span class="chip">Microservices</span>
             </div>
         </div>
-
-        <div class="tech-category reveal">
-            <h4>AI &amp; Machine Learning</h4>
-            <div class="tags">
-                <span class="tag"><i class="fa-solid fa-brain"></i> Gen AI Backend</span>
-                <span class="tag"><i class="fa-solid fa-link"></i> LangChain</span>
-                <span class="tag"><i class="fa-solid fa-diagram-project"></i> LangGraph</span>
-                <span class="tag"><i class="fa-solid fa-robot"></i> AI Agents</span>
-                <span class="tag"><i class="fa-solid fa-magnifying-glass-chart"></i> RAG Pipelines</span>
-                <span class="tag"><i class="fa-solid fa-database"></i> Vector DBs (Chroma/Pinecone)</span>
-                <span class="tag"><i class="fa-solid fa-microchip"></i> Llama 3 / Groq</span>
-                <span class="tag"><i class="fa-solid fa-bolt"></i> OpenAI / Azure</span>
-                <span class="tag"><i class="fa-solid fa-cube"></i> Hugging Face</span>
-                <span class="tag"><i class="fa-solid fa-network-wired"></i> Semantic Search</span>
+        <div class="cap">
+            <p class="cap__n">Layer 03</p>
+            <h3 class="cap__h">Ship &amp; Secure</h3>
+            <div class="chips">
+                <span class="chip">Docker</span><span class="chip">AWS</span><span class="chip">Git / GitHub</span>
+                <span class="chip">OAuth2</span><span class="chip">JWT</span><span class="chip">Alembic</span>
+                <span class="chip">Background Workers</span><span class="chip">SQL</span>
             </div>
         </div>
+    </div>
+</section>
 
-        <div class="tech-category reveal">
-            <h4>Backend, Data &amp; Infrastructure</h4>
-            <div class="tags">
-                <span class="tag"><i class="fa-solid fa-server"></i> FastAPI</span>
-                <span class="tag"><i class="fa-solid fa-database"></i> PostgreSQL</span>
-                <span class="tag"><i class="fa-solid fa-bolt"></i> Redis</span>
-                <span class="tag"><i class="fa-solid fa-table"></i> SQLAlchemy / SQLite</span>
-                <span class="tag"><i class="fa-solid fa-chart-simple"></i> Pandas / ETL</span>
-                <span class="tag"><i class="fa-solid fa-gears"></i> REST APIs</span>
-                <span class="tag"><i class="fa-solid fa-layer-group"></i> Microservices</span>
-                <span class="tag"><i class="fa-brands fa-docker"></i> Docker</span>
-                <span class="tag"><i class="fa-brands fa-git-alt"></i> Git / GitHub</span>
-                <span class="tag"><i class="fa-solid fa-shield-halved"></i> OAuth2 / JWT Security</span>
-                <span class="tag"><i class="fa-solid fa-cloud"></i> AWS / Cloud</span>
-            </div>
-        </div>
-    </section>
+<!-- =========================== EXPERIENCE =========================== -->
+<section class="sec" id="experience">
+    <div class="sec__head rise">
+        <p class="eyebrow">Experience</p>
+        <h2 class="sec__t">Where the work has run.</h2>
+    </div>
 
-    <section id="projects">
-        <h2 class="section-header white-title reveal">Engineering Portfolio</h2>
-        <div class="grid-2">
-
-            <div class="card reveal">
-                <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
-                <h3 class="white-title">Veridian: Autonomous Real Estate Intelligence</h3>
-                <p>An enterprise PropTech pipeline combined with an autonomous, tool-using AI Analyst. It orchestrates the harvesting of unstructured global property listings using headless Playwright automation, normalizes them via a Pandas data warehouse, and stores them via SQLAlchemy. Features a Zero-Framework ReAct loop binding to Groq's Llama 3.3 70B, allowing the agent to route execution between SQL toolkits, live web gateways, and deterministic financial calculators.</p>
-                <div class="tags" style="margin-top: auto;">
-                    <span class="tag">FastAPI</span><span class="tag">Playwright</span><span class="tag">Llama 3.3</span><span class="tag">Pandas</span>
-                </div>
-                <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/Veridian-REAL-ESTATE-INTELLIGENT" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
-                </div>
-            </div>
-
-            <div class="card reveal">
-                <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
-                <h3 class="white-title">Aisle — AI Retail Intelligence Agent</h3>
-                <p>An autonomous AI analyst for e-commerce. Aisle ingests store data into a consolidated warehouse and places a multi-tool AI agent on top. Uses a native tool-calling loop (Groq/Llama 3) with 12 tools to forecast demand, recommend pricing, and segment customers (RFM analysis). Responses stream token-by-token to a premium Next.js dashboard.</p>
-                <div class="tags" style="margin-top: auto;">
-                    <span class="tag">LangChain</span><span class="tag">Next.js</span><span class="tag">Groq</span><span class="tag">APScheduler</span>
-                </div>
-                <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/AISLE---RETAIL-AGENT" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
-                </div>
-            </div>
-
-            <div class="card reveal">
-                <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
-                <h3 class="white-title">AI Web Scraping Agent (SSRF-Hardened)</h3>
-                <p>An autonomous agent taking plain-English instructions to extract validated JSON from any website. Uses a two-stage fetch architecture to save costs. It dynamically generates extraction schemas at runtime and is fully SSRF-hardened by validating IPs against loopback and cloud-metadata ranges.</p>
-                <div class="tags" style="margin-top: auto;">
-                    <span class="tag">LangGraph</span><span class="tag">Security</span><span class="tag">Python</span>
-                </div>
-                <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/WEB-SCRAPING-AGENT" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
-                </div>
-            </div>
-
-            <div class="card reveal">
-                <img src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
-                <h3 class="white-title">NASTP Air-Gapped Examination Network</h3>
-                <p>An enterprise-grade, offline Client-Server architecture for high-security aerospace facilities. Bypasses the cloud by establishing an asynchronous HTTP polling network over a local subnet. Features an automated Pandas ETL engine to ingest messy CSV question banks.</p>
-                <div class="tags" style="margin-top: auto;">
-                    <span class="tag">Sockets</span><span class="tag">PySide6 (GUI)</span><span class="tag">SQLite</span>
-                </div>
-                <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/Secure-Exam-Software-FOR-NASTP" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
-                </div>
-            </div>
-
-            <div class="card reveal">
-                <img src="https://images.unsplash.com/photo-1543286386-2e659306cd6c?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
-                <h3 class="white-title">Automated Competitor Price Tracker</h3>
-                <p>An end-to-end Data Engineering pipeline that automatically extracts e-commerce pricing data via Python Requests, normalizes and enforces strict typing using Pandas, and loads it into a relational SQLite database via SQLAlchemy. Exposes secure REST API endpoints via FastAPI to serve real-time analytics.</p>
-                <div class="tags" style="margin-top: auto;">
-                    <span class="tag">ETL Pipeline</span><span class="tag">FastAPI</span><span class="tag">Chart.js</span><span class="tag">SQLAlchemy</span>
-                </div>
-                <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/Competitor-Price-Tracker/tree/main" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
-                </div>
-            </div>
-
-            <div class="card reveal">
-                <img src="https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
-                <h3 class="white-title">MarketSync: Multi-Source ETL Pipeline</h3>
-                <p>Extracts live job market data from isolated sources (REST APIs, Web Scrapers via BeautifulSoup, static CSVs), cleans it with strict Pandas logic, and unifies it into a single PostgreSQL Data Warehouse. Served via FastAPI to a responsive Tailwind dashboard.</p>
-                <div class="tags" style="margin-top: auto;">
-                    <span class="tag">BeautifulSoup</span><span class="tag">PostgreSQL</span><span class="tag">FastAPI</span>
-                </div>
-                <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/Multi-Source-Data-Extraction-Pipeline-Jobs-Market-Analytics" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
-                </div>
-            </div>
-
-            <div class="card reveal">
-                <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&q=80&w=1000" alt="" class="card-img" loading="lazy">
-                <h3 class="white-title">FastAPI Data Ingestion Engine (DaaS)</h3>
-                <p>Enterprise FastAPI backend for secure, high-concurrency asynchronous data processing. Implements strict OAuth2/JWT authentication, Alembic migrations, and Domain-Driven Design (DDD). Uses FastAPI BackgroundTasks and Pandas to process massive CSV workloads instantly.</p>
-                <div class="tags" style="margin-top: auto;">
-                    <span class="tag">OAuth2/JWT</span><span class="tag">Alembic</span><span class="tag">BackgroundTasks</span>
-                </div>
-                <div class="project-actions">
-                    <a href="https://github.com/Mibrahim25-debug/FastAPI-Data-Ingestion-Engine-DaaS" target="_blank" rel="noopener" class="project-link"><i class="fa-brands fa-github"></i> View on GitHub</a>
-                </div>
-            </div>
-
-        </div>
-    </section>
-
-    <section id="experience">
-        <h2 class="section-header white-title reveal">Experience &amp; Client Impact</h2>
-
-        <div class="grid-2">
+    <div class="ledger rise">
+        <div class="row">
+            <p class="row__k">1 yr+ · Current</p>
             <div>
-                <div class="card reveal" style="margin-bottom: 1.3rem;">
-                    <h3 class="white-title">Freelance Applied AI Engineer <span style="font-size: 0.85rem; color: var(--text-main); font-weight: 400;">| Upwork (1 Year+)</span></h3>
-                    <p>Maintaining a 100% Job Success Score. Designed and delivered LLM agent orchestration systems, automated extraction pipelines, and robust APIs. Replaced manual reporting workflows with deterministic Python logic for global clients.</p>
-                </div>
-
-                <div class="card reveal">
-                    <h3 class="white-title">AI Engineering Intern <span style="font-size: 0.85rem; color: var(--text-main); font-weight: 400;">| Inovaqo (4 Months)</span></h3>
-                    <p>Collaborated with the engineering team to optimize backend infrastructure using advanced Python and FastAPI. Cleaned datasets, wrote SQL queries, and gained hands-on commercial experience deploying scalable applications.</p>
-                </div>
+                <h3 class="row__t">Freelance Applied AI Engineer</h3>
+                <p class="row__w">Upwork · Global clients</p>
             </div>
-
-            <div style="display: flex; flex-direction: column; gap: 1rem;">
-                <div class="testimonial reveal">
-                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                    "Ibrahim delivered an exceptional piece of software architecture for our facility. We required a fully offline, examination network with zero internet connectivity due to strict security protocols. He engineered a flawless Python backend... highly recommended."
-                    <div class="testimonial-author">
-                        <strong class="white-title">AMSC PAC K.</strong> | Director of Training, NASTP
-                    </div>
-                </div>
-
-                <div class="testimonial reveal">
-                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                    "Ibrahim built exactly what we needed and delivered it on time. He took the time to understand our requirements before writing any code, which meant the agent worked properly from day one."
-                    <div class="testimonial-author">
-                        <strong class="white-title">Upwork Client</strong> | AI Agent Development (LangChain/RAG)
-                    </div>
-                </div>
-
-                <div class="testimonial reveal">
-                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                    "I have a great time working with Muhammad Ibrahim he is quick to the solution, fast, easily accessible... the work is delivered flawlessly."
-                    <div class="testimonial-author">
-                        <strong class="white-title">Upwork Client</strong> | Data Crawling &amp; Web Scraping
-                    </div>
-                </div>
-
-                <div class="testimonial reveal">
-                    <div class="stars"><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i></div>
-                    "Work was delivered exactly as we needed it. Passionate and eager to learn about the project scope, requirements and domain."
-                    <div class="testimonial-author">
-                        <strong class="white-title">Upwork Client</strong> | Senior Backend &amp; AI Engineering
-                    </div>
-                </div>
+            <p class="row__p">A 100% job success score held across the engagement. Delivered LLM agent orchestration systems, automated extraction pipelines and production APIs — replacing manual reporting workflows with deterministic Python logic.</p>
+        </div>
+        <div class="row">
+            <p class="row__k">4 months</p>
+            <div>
+                <h3 class="row__t">AI Engineering Intern</h3>
+                <p class="row__w">Inovaqo</p>
             </div>
+            <p class="row__p">Optimised backend infrastructure in Python and FastAPI alongside the engineering team, cleaned datasets, wrote the SQL layer, and gained hands-on commercial experience deploying scalable applications.</p>
         </div>
-    </section>
+    </div>
 
-    <section id="contact">
-        <h2 class="section-header white-title reveal">Let's Build Together</h2>
-        <div class="card reveal" style="text-align: center; max-width: 640px; margin: 0 auto; align-items: center;">
-            <h3 class="white-title" style="font-size: 1.4rem;">Ready to automate your workflows?</h3>
-            <p style="margin-bottom: 1.5rem; font-size: 0.95rem;">
-                I'm currently available for freelance projects and full-time opportunities. Whether you need a production-ready RAG system, an autonomous AI agent, or a complex ETL pipeline, let's talk about how we can build it.
-            </p>
-            <div style="display: flex; gap: 0.7rem; flex-wrap: wrap; justify-content: center;">
-                <a href="mailto:ibrahimirfanawan5@gmail.com" class="btn primary"><i class="fa-solid fa-envelope"></i> Send an Email</a>
-                <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener" class="btn" style="border-color: rgba(20,168,0,.45); color: #4ade80;"><i class="fa-solid fa-briefcase"></i> Hire me on Upwork</a>
+    <div class="sec__head rise" style="margin-top:clamp(2.5rem,5vw,4rem)">
+        <p class="eyebrow">Client reviews</p>
+        <h2 class="sec__t">Five stars, every engagement.</h2>
+        <p class="sec__note">Verified feedback from Upwork clients and direct enterprise engagements.</p>
+    </div>
+
+    <div class="words rise">
+        <blockquote class="word">
+            <div class="stars" role="img" aria-label="Rated 5 out of 5 stars">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
             </div>
+            <p class="word__q">"Ibrahim delivered an exceptional piece of software architecture for our facility. We required a fully offline examination network with zero internet connectivity due to strict security protocols. He engineered a flawless Python backend — highly recommended."</p>
+            <div class="word__b">
+                <div class="word__av">AK</div>
+                <div><strong>AMSC PAC K.</strong><span>Director of Training, NASTP</span></div>
+            </div>
+        </blockquote>
+
+        <blockquote class="word">
+            <div class="stars" role="img" aria-label="Rated 5 out of 5 stars">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+            </div>
+            <p class="word__q">"Ibrahim built exactly what we needed and delivered it on time. He took the time to understand our requirements before writing any code, which meant the agent worked properly from day one."</p>
+            <div class="word__b">
+                <div class="word__av">UC</div>
+                <div><strong>Upwork Client</strong><span>AI Agent Development · LangChain / RAG</span></div>
+            </div>
+        </blockquote>
+
+        <blockquote class="word">
+            <div class="stars" role="img" aria-label="Rated 5 out of 5 stars">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+            </div>
+            <p class="word__q">"I have a great time working with Muhammad Ibrahim — he is quick to the solution, fast, easily accessible, and the work is delivered flawlessly."</p>
+            <div class="word__b">
+                <div class="word__av">UC</div>
+                <div><strong>Upwork Client</strong><span>Data Crawling &amp; Web Scraping</span></div>
+            </div>
+        </blockquote>
+
+        <blockquote class="word">
+            <div class="stars" role="img" aria-label="Rated 5 out of 5 stars">
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+                <svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 2 3.1 6.3 6.9 1-5 4.9 1.2 6.8L12 17.8 5.8 21l1.2-6.8-5-4.9 6.9-1z"/></svg>
+            </div>
+            <p class="word__q">"Work was delivered exactly as we needed it. Passionate and eager to learn about the project scope, requirements and domain."</p>
+            <div class="word__b">
+                <div class="word__av">UC</div>
+                <div><strong>Upwork Client</strong><span>Senior Backend &amp; AI Engineering</span></div>
+            </div>
+        </blockquote>
+    </div>
+</section>
+
+<!-- ============================= CONTACT ============================= -->
+<section class="close" id="contact">
+    <div class="close__card rise">
+        <p class="eyebrow">Available for new work</p>
+        <h2 class="close__t">Let's build the version that ships.</h2>
+        <p class="close__p">Freelance projects and full-time roles alike — RAG systems, autonomous agents, or the ETL and API layer holding it all together.</p>
+        <div class="close__btns">
+            <a class="btn btn--pri" href="mailto:ibrahimirfanawan5@gmail.com">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 6L2 7"/></svg>
+                Contact me
+            </a>
+            <a class="btn" href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 7h-9M14 17H5"/><circle cx="17" cy="17" r="3"/><circle cx="7" cy="7" r="3"/></svg>
+                Let's work on Upwork
+            </a>
         </div>
-    </section>
+    </div>
+</section>
 
-    <footer class="footer">
-        <div class="logo-container" style="display: inline-block; margin-bottom: 1.5rem;">M. IBRAHIM</div>
-        <div class="social-links" style="justify-content: center; margin-bottom: 1.5rem;">
-            <a href="https://github.com/Mibrahim25-debug" target="_blank" rel="noopener"><i class="fa-brands fa-github"></i></a>
-            <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" rel="noopener"><i class="fa-brands fa-linkedin"></i></a>
-            <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener"><i class="fa-solid fa-briefcase"></i></a>
-        </div>
-        <p class="white-title">Applied AI &amp; Backend Engineer</p>
-        <p style="font-size: 0.82rem; margin-top: 0.7rem;">Building systems that run in production, not just in notebooks.</p>
-    </footer>
+</main>
 
-    <script>
-        const nav = document.getElementById('nav');
-        addEventListener('scroll', () => {
-            nav.classList.toggle('scrolled', scrollY > 20);
-        }, { passive: true });
+<footer class="foot">
+    <p>© <span id="yr">2026</span> Ibrahim Awan · Applied AI Engineer</p>
+    <div class="foot__links">
+        <a href="https://github.com/Mibrahim25-debug" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/muhammad-ibrahim-awan-94aa18240/" target="_blank" rel="noopener">LinkedIn</a>
+        <a href="https://www.upwork.com/freelancers/muhammadibrahima7" target="_blank" rel="noopener">Upwork</a>
+    </div>
+</footer>
 
-        const io = new IntersectionObserver((entries) => {
-            entries.forEach((e) => {
-                if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+<script>
+(function () {
+    'use strict';
+
+    var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var clamp = function (v, a, b) { return v < a ? a : v > b ? b : v; };
+
+    document.getElementById('yr').textContent = new Date().getFullYear();
+
+    var burger = document.getElementById('burger');
+    var sheet = document.getElementById('sheet');
+    var lenis = null;
+
+    function closeSheet() {
+        burger.classList.remove('is-open');
+        sheet.classList.remove('is-open');
+        burger.setAttribute('aria-expanded', 'false');
+        setTimeout(function () { if (!sheet.classList.contains('is-open')) sheet.hidden = true; }, 300);
+    }
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    if (!reduced) {
+        lenis = new Lenis({ lerp: 0.09, wheelMultiplier: 0.95, smoothWheel: true });
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+        gsap.ticker.lagSmoothing(0);
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+        var href = a.getAttribute('href');
+        if (!href || href.length < 2) return;
+        var target = document.querySelector(href);
+        if (!target) return;
+        a.addEventListener('click', function (e) {
+            e.preventDefault();
+            closeSheet();
+            if (lenis) lenis.scrollTo(target, { duration: 1.15 });
+            else target.scrollIntoView();
+        });
+    });
+
+    var nav = document.getElementById('nav');
+    ScrollTrigger.create({
+        start: 0, end: 99999,
+        onUpdate: function (self) { nav.classList.toggle('is-stuck', self.scroll() > 16); }
+    });
+    gsap.to('#progress', {
+        scaleX: 1, ease: 'none',
+        scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 0.3 }
+    });
+
+    burger.addEventListener('click', function () {
+        var open = !sheet.classList.contains('is-open');
+        if (open) {
+            sheet.hidden = false;
+            requestAnimationFrame(function () { sheet.classList.add('is-open'); });
+            burger.classList.add('is-open');
+            burger.setAttribute('aria-expanded', 'true');
+        } else { closeSheet(); }
+    });
+    addEventListener('keydown', function (e) { if (e.key === 'Escape') closeSheet(); });
+
+    /* hero entrance -------------------------------------------------- */
+    if (!reduced) {
+        gsap.timeline({ defaults: { ease: 'power3.out' } })
+            .from('.hero .eyebrow',  { y: 14, opacity: 0, duration: .65 })
+            .from('.hero__title',    { y: 24, opacity: 0, duration: .9 }, '-=.45')
+            .from('.hero .lede',     { y: 18, opacity: 0, duration: .75 }, '-=.65')
+            .from('.hero__cta .btn', { y: 14, opacity: 0, duration: .65, stagger: .07 }, '-=.5')
+            .from('.hero__stats div',{ y: 12, opacity: 0, duration: .55, stagger: .07 }, '-=.4')
+            .from('.hero__big-name', { x: 40, opacity: 0, duration: 1.1 }, .1);
+
+        gsap.to('.scroll-cue', {
+            opacity: 0, ease: 'none',
+            scrollTrigger: { trigger: '.hero', start: 'top top', end: 'bottom 70%', scrub: true }
+        });
+
+        /* the light bodies drift against the scroll at different rates, so the
+           background gains parallax depth without any visible structure */
+        gsap.to('.amb__l--mid',  { yPercent: -12, ease: 'none', scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 1 } });
+        gsap.to('.amb__l--near', { yPercent: -26, ease: 'none', scrollTrigger: { trigger: document.body, start: 'top top', end: 'bottom bottom', scrub: 1 } });
+    }
+
+    /* pinned approach beats ------------------------------------------ */
+    var beats = Array.prototype.slice.call(document.querySelectorAll('.beat'));
+    var beatIdx = Array.prototype.slice.call(document.querySelectorAll('#beatIndex li'));
+    var beatNum = document.getElementById('beatNum');
+    var active = -1;
+
+    function showBeat(i) {
+        if (i === active) return;
+        var forward = i > active;
+        active = i;
+        beats.forEach(function (b, n) {
+            var on = n === i;
+            b.classList.toggle('is-on', on);
+            if (reduced) return;
+            gsap.killTweensOf(b); gsap.killTweensOf(b.children);
+            if (on) {
+                gsap.fromTo(b, { autoAlpha: 0 }, { autoAlpha: 1, duration: .4, ease: 'power2.out' });
+                gsap.fromTo(b.children,
+                    { y: forward ? 24 : -24, opacity: 0 },
+                    { y: 0, opacity: 1, duration: .7, stagger: .08, ease: 'power3.out' });
+            } else {
+                gsap.to(b, { autoAlpha: 0, duration: .22, ease: 'power2.in' });
+            }
+        });
+        beatIdx.forEach(function (li, n) { li.classList.toggle('is-on', n === i); });
+        if (beatNum) beatNum.textContent = '0' + (i + 1);
+    }
+
+    if (reduced) {
+        beats.forEach(function (b) { b.classList.add('is-on'); });
+    } else {
+        ScrollTrigger.create({
+            trigger: '.approach', start: 'top top',
+            end: function () { return '+=' + (innerHeight * beats.length); },
+            pin: true, scrub: true, anticipatePin: 1, invalidateOnRefresh: true,
+            onUpdate: function (self) { showBeat(clamp(Math.floor(self.progress * beats.length), 0, beats.length - 1)); }
+        });
+        showBeat(0);
+    }
+
+    /* work: sticky stack depth ---------------------------------------
+       Each card is pinned by pure CSS `position: sticky`. As the next
+       card scrolls up, its OPAQUE background is what should hide the one
+       underneath — not a fade. Dimming the outgoing card via opacity or
+       filter:brightness() makes it flash black/see-through in the gap
+       before full coverage, which is the exact bug being fixed here.
+       Explicit z-index guarantees each later card always paints over the
+       one before it, so a plain, subtle scale is enough to sell depth. */
+    var stackCards = Array.prototype.slice.call(document.querySelectorAll('.proj'));
+    stackCards.forEach(function (card, i) { card.style.zIndex = String(i + 1); });
+
+    if (!reduced) {
+        gsap.matchMedia().add('(min-width: 821px)', function () {
+            var tweens = [];
+            stackCards.forEach(function (card, i) {
+                if (i === stackCards.length - 1) return;
+                tweens.push(gsap.to(card, {
+                    scale: 0.96,
+                    ease: 'none',
+                    scrollTrigger: {
+                        trigger: stackCards[i + 1],
+                        start: 'top bottom',
+                        end: 'top top+=92', // matches the card's sticky top offset (--nav-h + 1.2rem)
+                        scrub: true,
+                        invalidateOnRefresh: true
+                    }
+                }));
             });
-        }, { rootMargin: '0px 0px -6% 0px', threshold: 0.04 });
-        document.querySelectorAll('.reveal').forEach((el) => io.observe(el));
-    </script>
+            return function () {
+                tweens.forEach(function (t) { if (t.scrollTrigger) t.scrollTrigger.kill(); t.kill(); });
+                gsap.set(stackCards, { clearProps: 'transform' });
+            };
+        });
+    }
+
+    /* reveals --------------------------------------------------------- */
+    var rises = document.querySelectorAll('.rise');
+    if (reduced) {
+        rises.forEach(function (el) { el.classList.add('is-in'); });
+    } else {
+        rises.forEach(function (el) {
+            ScrollTrigger.create({
+                trigger: el, start: 'top 88%', once: true,
+                onEnter: function () { el.classList.add('is-in'); }
+            });
+        });
+    }
+
+    /* scrollspy ------------------------------------------------------- */
+    var links = Array.prototype.slice.call(document.querySelectorAll('.nav__links a'));
+    links.forEach(function (a) {
+        var target = document.querySelector(a.getAttribute('href'));
+        if (!target) return;
+        ScrollTrigger.create({
+            trigger: target, start: 'top 55%', end: 'bottom 45%',
+            onToggle: function (self) {
+                if (self.isActive) links.forEach(function (l) { l.classList.toggle('is-on', l === a); });
+            }
+        });
+    });
+
+    addEventListener('load', function () { ScrollTrigger.refresh(); });
+})();
+</script>
 
 </body>
 </html>
